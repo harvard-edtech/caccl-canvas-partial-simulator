@@ -1,0 +1,43 @@
+{
+  "name": "canvas-partial-simulator",
+  "version": "1.0.0",
+  "description": "Partially simulates a Canvas instance, handling OAuth token exchanges and forwarding API requests",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harvard-edtech/canvas-partial-simulator.git"
+  },
+  "keywords": [
+    "Canvas",
+    "Simulator",
+    "OAuth",
+    "Token"
+  ],
+  "author": "Gabriel Abrams <gabeabrams@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/harvard-edtech/canvas-partial-simulator/issues"
+  },
+  "homepage": "https://github.com/harvard-edtech/canvas-partial-simulator#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "caccl": "^1.0.21",
+    "caccl-api-forwarder": "^1.0.1",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "fs": "0.0.1-security",
+    "https": "^1.0.0",
+    "randomstring": "^1.1.5"
+  },
+  "devDependencies": {
+    "eslint": "^5.12.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.2",
+    "eslint-plugin-react": "^7.12.3"
+  }
+}
