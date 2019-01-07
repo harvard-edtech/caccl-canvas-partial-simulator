@@ -25,12 +25,14 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "caccl": "^1.0.21",
-    "caccl-api-forwarder": "^1.0.1",
+    "caccl-api-forwarder": "^1.0.3",
+    "caccl-authorizer": "^1.0.1",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "fs": "0.0.1-security",
     "https": "^1.0.0",
+    "oauth-signature": "^1.5.0",
     "randomstring": "^1.1.5"
   },
   "devDependencies": {

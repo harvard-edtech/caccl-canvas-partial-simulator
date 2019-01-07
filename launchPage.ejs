@@ -1,0 +1,23 @@
+<head>
+  <!-- Metadata to make scaling work better -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Launch</title>
+
+</head>
+
+<body>
+  <div style="text-align: center; font-size: 2em">
+    Click to simulate LTI Launch:
+    <form action="<%= launchURL %>" method="POST">
+      <% for (let prop in launchBody) { %>
+        <% const value = launchBody[prop]; %>
+        <input type="hidden" name="<%= prop %>" value="<%- value %>">
+      <% } %>
+      <input type="submit" value="Launch">
+    </form>
+  </div>
+
+</body>

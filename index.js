@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const https = require('https');
 const randomstring = require('randomstring');
 
+const initLaunches = require('./initLaunches');
 const initOAuth = require('./initOAuth');
 
 /**
@@ -15,8 +16,14 @@ const initOAuth = require('./initOAuth');
  *   OAuth authorization requests and forwards all other requests
  * @author Gabriel Abrams
  * @param {string} accessToken - the access token to send to requester
+ * @param {string} consumerKey - the consumer key of the installation for the
+ *   created OAuth message
+ * @param {string} consumerSecret - the consumer secret of the installation so
+ *   we can encrypt the OAuth message
  * @param {string} [canvasHost=canvas.instructure.com] - the Canvas host to
  *   forward requests to
+ * @param {string} [launchURL=https://localhost/launch] - the url to visit for
+ *   simulated LTI launches
  */
 
 module.exports = (config) => {
@@ -108,8 +115,22 @@ module.exports = (config) => {
     }
   });
 
+  // Initialize LTI launches
+  initLaunches({
+    app,
+    canvasHost: config.canvasHost,
+    accessToken: config.accessToken,
+    launchURL: config.launchURL || 'https://localhost/launch',
+    consumerKey: config.consumerKey,
+    consumerSecret: config.consumerSecret,
+  });
+
   // Initialize OAuth
-  initOAuth(app, config.canvasHost, config.accessToken);
+  initOAuth({
+    app,
+    canvasHost: config.canvasHost,
+    accessToken: config.accessToken,
+  });
 
   // Initialize the API
   initAPIForwarding({

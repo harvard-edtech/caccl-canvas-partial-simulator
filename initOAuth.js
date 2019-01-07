@@ -13,12 +13,12 @@ const genCode = () => {
 const clientId = 'client_id';
 const clientSecret = 'client_secret';
 
-module.exports = (app, canvasHost, accessToken) => {
+module.exports = (config) => {
   // Get information on the current user
   let user;
   const api = initCACCL({
-    canvasHost,
-    accessToken,
+    canvasHost: config.canvasHost,
+    accessToken: config.accessToken,
   });
   api.user.self.getProfile()
     .then((profile) => {
@@ -40,7 +40,7 @@ module.exports = (app, canvasHost, accessToken) => {
     tokenExpiry = new Date().getTime() + 3600000;
   };
 
-  app.get('/login/oauth2/auth', (req, res) => {
+  config.app.get('/login/oauth2/auth', (req, res) => {
     const { state } = req.query;
     const redirectURI = req.query.redirect_uri;
 
@@ -70,7 +70,7 @@ module.exports = (app, canvasHost, accessToken) => {
     });
   });
 
-  app.post('/login/oauth2/token', (req, res) => {
+  config.app.post('/login/oauth2/token', (req, res) => {
     // Handle code-based authorization request
     if (req.body.grant_type === 'authorization_code') {
       if (clientId !== req.body.client_id) {
@@ -95,7 +95,7 @@ module.exports = (app, canvasHost, accessToken) => {
 
       resetTokenExpiry();
       return res.json({
-        access_token: accessToken,
+        access_token: config.accessToken,
         refresh_token: REFRESH_TOKEN,
         expires_in: 3600,
         token_type: 'Bearer',
@@ -132,7 +132,7 @@ module.exports = (app, canvasHost, accessToken) => {
 
       resetTokenExpiry();
       return res.json({
-        access_token: accessToken,
+        access_token: config.accessToken,
         expires_in: 3600,
         token_type: 'Bearer',
         user:
@@ -150,7 +150,7 @@ module.exports = (app, canvasHost, accessToken) => {
   });
 
   // Simulate process of token expiring
-  app.all('*', (req, res, next) => {
+  config.app.all('*', (req, res, next) => {
     if (req.body.access_token && !tokenIsValid()) {
       req.body.access_token = 'invalid_access_token';
     }
