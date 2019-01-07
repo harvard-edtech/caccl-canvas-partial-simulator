@@ -16,12 +16,12 @@ const initOAuth = require('./initOAuth');
  *   OAuth authorization requests and forwards all other requests
  * @author Gabriel Abrams
  * @param {string} accessToken - the access token to send to requester
- * @param {string} consumerKey - the consumer key of the installation for the
- *   created OAuth message
- * @param {string} consumerSecret - the consumer secret of the installation so
- *   we can encrypt the OAuth message
  * @param {string} [canvasHost=canvas.instructure.com] - the Canvas host to
  *   forward requests to
+ * @param {string} [consumerKey=consumer_key] - the consumer key of the
+ *   installation for the created OAuth message
+ * @param {string} [consumerSecret=consumer_secret] - the consumer secret of the
+ *   installation so we can encrypt the OAuth message
  * @param {string} [launchURL=https://localhost/launch] - the url to visit for
  *   simulated LTI launches
  */
@@ -29,6 +29,8 @@ const initOAuth = require('./initOAuth');
 module.exports = (config) => {
   const app = express();
   const port = 8088;
+
+  const canvasHost = config.canvasHost || 'canvas.instructure.com';
 
   console.log(`Simulating Canvas at https://localhost:${port}`);
 
@@ -118,7 +120,7 @@ module.exports = (config) => {
   // Initialize LTI launches
   initLaunches({
     app,
-    canvasHost: config.canvasHost,
+    canvasHost,
     accessToken: config.accessToken,
     launchURL: config.launchURL || 'https://localhost/launch',
     consumerKey: config.consumerKey,
@@ -128,14 +130,14 @@ module.exports = (config) => {
   // Initialize OAuth
   initOAuth({
     app,
-    canvasHost: config.canvasHost,
+    canvasHost,
     accessToken: config.accessToken,
   });
 
   // Initialize the API
   initAPIForwarding({
     app,
-    canvasHost: config.canvasHost,
+    canvasHost,
     apiForwardPathPrefix: null,
     numRetries: 1,
   });

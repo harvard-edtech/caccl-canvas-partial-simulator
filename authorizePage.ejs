@@ -86,6 +86,8 @@
       padding-bottom: 20px;
       margin-bottom: 10px;
       text-decoration: none;
+      text-align: center;
+      border: 1px solid gray;
     }
 
     /* Highlight the authorize button on hover */
@@ -106,6 +108,9 @@
       padding-bottom: 20px;
       margin-bottom: 10px;
       text-decoration: none;
+      text-align: center;
+      margin-top: 20px;
+      border: 1px solid gray;
     }
 
     /* Highlight the cancel button on hover */
@@ -115,7 +120,8 @@
 
     /* Large app title */
     .app-title {
-      font-size: 1.2em;
+      font-size: 1.5em;
+      margin-bottom: 10px;
     }
   </style>
 
@@ -137,7 +143,7 @@
       <div class="app-title">
         Unnamed LTI App
       </div>
-      <div>
+      <div style="margin-bottom: 5px;">
         <strong>Unnamed LTI App is requesting access to your account.</strong>
       </div>
       <div>
@@ -147,10 +153,10 @@
         Your email address is simulated@email.com.
       </div>
 
-      <a class="cancel-button" href="<% cancelURL %>">
+      <a class="cancel-button" href="<%= cancelURL %>">
         Cancel
       </a>
-      <a class="authorize-button" href="<% approveURL %>">
+      <a class="authorize-button" href="<%= approveURL %>">
         Authorize
       </a>
     </div><!-- End Content -->

@@ -2,16 +2,16 @@ const path = require('path');
 const initCACCL = require('caccl/script');
 
 const codes = {};
+
 const REFRESH_TOKEN = 'dskfur392nbfassfdlkjanseflkjsdfow';
+const CLIENT_ID = 'client_id';
+const CLIENT_SECRET = 'client_secret';
 
 const genCode = () => {
   const nextCode = new Date().getTime();
   codes[nextCode] = true;
   return nextCode;
 };
-
-const clientId = 'client_id';
-const clientSecret = 'client_secret';
 
 module.exports = (config) => {
   // Get information on the current user
@@ -45,7 +45,7 @@ module.exports = (config) => {
     const redirectURI = req.query.redirect_uri;
 
     // Detect and complain about unknown clients
-    if (clientId !== req.query.client_id) {
+    if (CLIENT_ID !== req.query.client_id) {
       return res.send('while(1);{"error":"invalid_client","error_description":"unknown client"}');
     }
 
@@ -64,22 +64,22 @@ module.exports = (config) => {
 
     // Show authorize page
     res.render(path.join(__dirname, 'authorizePage.ejs'), {
-      user,
+      user: user || {},
       cancelURL: `${redirectURI}?error=access_denied`,
-      authorizeURL: `${redirectURI}?code=${code}&state=${state}`,
+      approveURL: `${redirectURI}?code=${code}&state=${state}`,
     });
   });
 
   config.app.post('/login/oauth2/token', (req, res) => {
     // Handle code-based authorization request
     if (req.body.grant_type === 'authorization_code') {
-      if (clientId !== req.body.client_id) {
+      if (CLIENT_ID !== req.body.client_id) {
         return res.status(401).json({
           error: 'invalid_client',
           error_description: 'unknown client',
         });
       }
-      if (clientSecret !== req.body.client_secret) {
+      if (CLIENT_SECRET !== req.body.client_secret) {
         return res.status(401).json({
           error: 'invalid_client',
           error_description: 'invalid client',
@@ -111,13 +111,13 @@ module.exports = (config) => {
 
     // Handle refresh token request
     if (req.body.grant_type === 'refresh_token') {
-      if (clientId !== req.body.client_id) {
+      if (CLIENT_ID !== req.body.client_id) {
         return res.status(401).json({
           error: 'invalid_client',
           error_description: 'unknown client',
         });
       }
-      if (clientSecret !== req.body.client_secret) {
+      if (CLIENT_SECRET !== req.body.client_secret) {
         return res.status(401).json({
           error: 'invalid_client',
           error_description: 'invalid client',
@@ -151,7 +151,9 @@ module.exports = (config) => {
 
   // Simulate process of token expiring
   config.app.all('*', (req, res, next) => {
+    console.log('Got request', req.body, req.query, req.url);
     if (req.body.access_token && !tokenIsValid()) {
+      console.log('Stripping access token');
       req.body.access_token = 'invalid_access_token';
     }
     next();

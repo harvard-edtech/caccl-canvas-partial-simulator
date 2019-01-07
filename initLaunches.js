@@ -54,7 +54,7 @@ module.exports = (config) => {
         });
       })
       .catch((err) => {
-        console.log(err, err.message, err.stack);
+        return res.send(`An error occurred:\n${err.message}`);
       });
   });
 };
