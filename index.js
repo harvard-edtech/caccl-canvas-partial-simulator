@@ -24,15 +24,17 @@ const initOAuth = require('./initOAuth');
  *   installation so we can encrypt the OAuth message
  * @param {string} [launchURL=https://localhost/launch] - the url to visit for
  *   simulated LTI launches
+ * @param {function} [onSuccess] - a handler function to call when the
+ *   simulation has been started successfully
  */
 
-module.exports = (config) => {
+module.exports = (config = {}) => {
+  const { onSuccess } = config;
+
   const app = express();
   const port = 8088;
 
   const canvasHost = config.canvasHost || 'canvas.instructure.com';
-
-  console.log(`Simulating Canvas at https://localhost:${port}`);
 
   // Set up ejs
   app.set('view engine', 'ejs');
@@ -110,10 +112,13 @@ module.exports = (config) => {
     cert,
   }, app);
   server.listen(port, (err) => {
+    console.log('Success', port, err);
     if (err) {
       console.log(`An error occurred while trying to listen and use SSL on port ${port}:`, err);
+    } else if (onSuccess) {
+      onSuccess(port);
     } else {
-      console.log(`Now listening and using SSL on port ${port}`);
+      console.log(`Now partially simulating Canvas on port ${port}`);
     }
   });
 
