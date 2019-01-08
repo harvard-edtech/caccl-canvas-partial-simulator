@@ -11,6 +11,8 @@ const randomstring = require('randomstring');
 const initLaunches = require('./initLaunches');
 const initOAuth = require('./initOAuth');
 
+/* eslint-disable no-console */
+
 /**
  * Initialize a simulated Canvas environment that automatically responds to
  *   OAuth authorization requests and forwards all other requests
@@ -127,8 +129,8 @@ module.exports = (config = {}) => {
     canvasHost,
     accessToken: config.accessToken,
     launchURL: config.launchURL || 'https://localhost/launch',
-    consumerKey: config.consumerKey,
-    consumerSecret: config.consumerSecret,
+    consumerKey: config.consumerKey || 'consumer_key',
+    consumerSecret: config.consumerSecret || 'consumer_secret',
   });
 
   // Initialize OAuth
