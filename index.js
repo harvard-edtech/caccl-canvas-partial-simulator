@@ -112,7 +112,6 @@ module.exports = (config = {}) => {
     cert,
   }, app);
   server.listen(port, (err) => {
-    console.log('Success', port, err);
     if (err) {
       console.log(`An error occurred while trying to listen and use SSL on port ${port}:`, err);
     } else if (onSuccess) {

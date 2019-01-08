@@ -151,9 +151,7 @@ module.exports = (config) => {
 
   // Simulate process of token expiring
   config.app.all('*', (req, res, next) => {
-    console.log('Got request', req.body, req.query, req.url);
     if (req.body.access_token && !tokenIsValid()) {
-      console.log('Stripping access token');
       req.body.access_token = 'invalid_access_token';
     }
     next();
