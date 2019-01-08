@@ -17,7 +17,7 @@ const oauth = require('oauth-signature');
  *   we can encrypt the OAuth message
  */
 module.exports = (config) => {
-  config.app.get('/courses/:course/launch', (req, res) => {
+  config.app.get('/courses/:course', (req, res) => {
     const api = initCACCL({
       canvasHost: config.canvasHost,
       accessToken: config.accessToken,
