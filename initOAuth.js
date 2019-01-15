@@ -50,7 +50,7 @@ module.exports = (config) => {
     }
 
     // Detect and complain about invalid redirectURI
-    if (!redirectURI.startsWith('https://localhost')) {
+    if (!redirectURI || !redirectURI.startsWith('https://localhost')) {
       return res.send('while(1);{"error":"invalid_request","error_description":"redirect_uri does not match client settings"}');
     }
 

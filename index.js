@@ -147,4 +147,9 @@ module.exports = (config = {}) => {
     apiForwardPathPrefix: null,
     numRetries: 1,
   });
+
+  return {
+    app,
+    server,
+  };
 };
