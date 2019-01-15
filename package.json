@@ -4,7 +4,7 @@
   "description": "Partially simulates a Canvas instance, handling OAuth token exchanges and forwarding API requests",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --exit --reporter spec"
+    "test": "node test"
   },
   "repository": {
     "type": "git",
@@ -23,8 +23,9 @@
   },
   "homepage": "https://github.com/harvard-edtech/canvas-partial-simulator#readme",
   "dependencies": {
+    "axios": "^0.18.0",
     "body-parser": "^1.18.3",
-    "caccl": "^1.0.32",
+    "caccl": "^1.0.34",
     "caccl-api-forwarder": "^1.0.5",
     "caccl-authorizer": "^1.0.4",
     "ejs": "^2.6.1",
@@ -36,11 +37,15 @@
     "randomstring": "^1.1.5"
   },
   "devDependencies": {
+    "cypress": "^3.1.4",
     "eslint": "^5.12.0",
     "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-cypress": "^2.2.0",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-jsx-a11y": "^6.1.2",
     "eslint-plugin-react": "^7.12.3",
-    "mocha": "^5.2.0"
+    "ims-lti": "^3.0.2",
+    "mocha": "^5.2.0",
+    "prompt-sync": "^4.1.6"
   }
 }
