@@ -6,6 +6,12 @@
 
   <title>Launch</title>
 
+  <!-- jQuery -->
+  <script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+
   <!-- Import google font to match Canvas authorization page font -->
   <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
 
@@ -98,6 +104,33 @@
     }
   </style>
 
+  <script type="text/javascript">
+    function submit() {
+      // Make a new call to get new launch info
+      $.get('<%= launchDataURL %>', function (data) {
+        if (data.error) {
+          // Display error and stop fetching
+          alert('An error occurred: ' + data.error + '\nPlease try again.');
+          return;
+        }
+
+        // Create form fields
+        document.getElementById('form').innerHTML = '';
+        for (var prop in data) {
+          document.getElementById('form').innerHTML += ''
+        }
+
+        // Update the launch form with the new data
+        for (var prop in data) {
+          document.getElementById('form').innerHTML += '<input type="hidden" name="' + prop + '" value="' + data[prop] + '">\n';
+        }
+
+        // Submit the form
+        document.getElementById('form').submit();
+      });
+    }
+  </script>
+
 </head>
 
 <body>
@@ -114,12 +147,9 @@
     <!-- Content (list of courses) -->
     <div class="content">
       <form action="<%= launchURL %>" method="POST" id="form">
-        <% for (let prop in launchBody) { %>
-          <% const value = launchBody[prop]; %>
-          <input type="hidden" name="<%= prop %>" value="<%- value %>">
-        <% } %>
+        <!-- Form content will be populated after GET -->
       </form>
-      <button id="launch-button" type="button" onclick="document.getElementById('form').submit()" class="launch-button">
+      <button id="launch-button" type="button" onclick="submit()" class="launch-button">
         Simulate Launch
       </button>
     </div><!-- End Content -->

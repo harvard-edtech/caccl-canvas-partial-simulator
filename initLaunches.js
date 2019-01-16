@@ -18,6 +18,13 @@ const oauth = require('oauth-signature');
  */
 module.exports = (config) => {
   config.app.get('/courses/:course', (req, res) => {
+    return res.render(path.join(__dirname, 'launchPage'), {
+      launchURL: config.launchURL,
+      launchDataURL: req.url + '/launchdata',
+    });
+  });
+
+  config.app.get('/courses/:course/launchdata', (req, res) => {
     const api = initCACCL({
       canvasHost: config.canvasHost,
       accessToken: config.accessToken,
@@ -47,14 +54,13 @@ module.exports = (config) => {
             config.consumerSecret
           )
         );
-
-        return res.render(path.join(__dirname, 'launchPage'), {
-          launchURL: config.launchURL,
-          launchBody: simulatedLTILaunchBody,
-        });
+        return res.json(simulatedLTILaunchBody);
       })
       .catch((err) => {
-        return res.send(`An error occurred:\n${err.message}`);
+        return res.json({
+          error: err.message,
+          code: err.code,
+        });
       });
   });
 };
