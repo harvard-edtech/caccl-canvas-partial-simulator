@@ -221,8 +221,8 @@ app.post('/launch', (req, res) => {
 
       // Request validity
       addRow(
-        'request validity (expected will be undefined)',
-        'is true',
+        'oauth_signature',
+        'is valid',
         valid,
         valid
       );

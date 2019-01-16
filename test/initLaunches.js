@@ -45,11 +45,6 @@ module.exports = (config) => {
         // Add consumer id
         simulatedLTILaunchBody.oauth_consumer_key = config.consumerKey;
 
-        // Convert everything to strings
-        Object.keys(simulatedLTILaunchBody).forEach((key) => {
-          simulatedLTILaunchBody[key] = String(simulatedLTILaunchBody[key]);
-        });
-
         // Create signature
         simulatedLTILaunchBody.oauth_signature = decodeURIComponent(
           oauth.generate(
@@ -59,6 +54,7 @@ module.exports = (config) => {
             config.consumerSecret
           )
         );
+
         return res.json(simulatedLTILaunchBody);
       })
       .catch((err) => {
