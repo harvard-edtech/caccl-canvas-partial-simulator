@@ -1,5 +1,10 @@
+Create the following file in the `test/` folder:
+
+```js
+// devEnvironment.js
 module.exports = {
-  accessToken: '1875~54D3uSDrrlVhMKSeqgFoK6FGprrOIG8W50wNuYZb7idrLmXlFWm1MtVI8PVmX6Fh',
-  canvasHost: 'canvas.harvard.edu',
-  courseId: 53450,
+  accessToken: /* Canvas access token */,
+  canvasHost: /* Canvas host: e.g., canvas.harvard.edu */,
+  courseId: /* Canvas test course id */,
 };
+```
