@@ -28,6 +28,8 @@ const initOAuth = require('./initOAuth');
  *   simulated LTI launches
  * @param {function} [onSuccess] - a handler function to call when the
  *   simulation has been started successfully
+ * @return {object} {app, server} where app is the express app and server is the
+ *   https server for the partially simulated Canvas instance
  */
 
 module.exports = (config = {}) => {
