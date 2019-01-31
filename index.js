@@ -28,6 +28,7 @@ const initOAuth = require('./initOAuth');
  *   simulated LTI launches
  * @param {function} [onSuccess] - a handler function to call when the
  *   simulation has been started successfully
+ * @param {boolean} [dontPrint] - if true, no console logs will be printed
  * @return {object} {app, server} where app is the express app and server is the
  *   https server for the partially simulated Canvas instance
  */
@@ -88,8 +89,10 @@ module.exports = (config = {}) => {
   const sslKey = path.join(__dirname, 'ssl/key.pem');
   const sslCertificate = path.join(__dirname, 'ssl/cert.pem');
 
-  console.log('\nNote: we\'re using a self-signed certificate!');
-  console.log(`- Please visit https://localhost:${port}/verifycert to make sure the certificate is accepted by your browser\n`);
+  if (!config.dontPrint) {
+    console.log('\nNote: we\'re using a self-signed certificate!');
+    console.log(`- Please visit https://localhost:${port}/verifycert to make sure the certificate is accepted by your browser\n`);
+  }
 
   // Add route for verifying self-signed certificate
   app.get('/verifycert', (req, res) => {
@@ -117,10 +120,12 @@ module.exports = (config = {}) => {
   }, app);
   server.listen(port, (err) => {
     if (err) {
-      console.log(`An error occurred while trying to listen and use SSL on port ${port}:`, err);
+      if (!config.dontPrint) {
+        console.log(`An error occurred while trying to listen and use SSL on port ${port}:`, err);
+      }
     } else if (onSuccess) {
       onSuccess(port);
-    } else {
+    } else if (!config.dontPrint) {
       console.log(`Now partially simulating Canvas on port ${port}`);
     }
   });
