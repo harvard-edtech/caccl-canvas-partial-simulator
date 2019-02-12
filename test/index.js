@@ -238,7 +238,7 @@ app.post('/launch', (req, res) => {
 
       // Timestamp
       const age = (
-        (new Date().getTime() / 1000)
+        (Date.now() / 1000)
         - (req.body.oauth_timestamp || 0)
       );
       pass = (age > -1 && age <= 5);

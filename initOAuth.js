@@ -8,7 +8,7 @@ const CLIENT_ID = 'client_id';
 const CLIENT_SECRET = 'client_secret';
 
 const genCode = () => {
-  const nextCode = new Date().getTime();
+  const nextCode = Date.now();
   codes[nextCode] = true;
   return nextCode;
 };
@@ -34,10 +34,10 @@ module.exports = (config) => {
     if (!tokenExpiry) {
       return false;
     }
-    return tokenExpiry > new Date().getTime();
+    return tokenExpiry > Date.now();
   };
   const resetTokenExpiry = () => {
-    tokenExpiry = new Date().getTime() + 3600000;
+    tokenExpiry = Date.now() + 3600000;
   };
 
   config.app.get('/login/oauth2/auth', (req, res) => {
