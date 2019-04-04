@@ -102,10 +102,21 @@
     .launch-button:hover {
       background-color: #48a8f0;
     }
+
+    /* Gray out the launch button when it's disabled */
+    .launch-button:disabled {
+      background-color: gray;
+      pointer-events: none;
+    }
   </style>
 
   <script type="text/javascript">
     function submit() {
+      // Indicate to user that the click has registered
+      var launchButton = document.getElementById('launch-button');
+      launchButton.disabled = true;
+      launchButton.innerHTML = 'Waiting on Canvas...';
+
       // Make a new call to get new launch info
       $.get('<%= launchDataURL %>', function (data) {
         if (data.error) {
@@ -121,6 +132,10 @@
         for (var prop in data) {
           document.getElementById('form').innerHTML += '<input type="hidden" name="' + prop + '" value="' + data[prop] + '">\n';
         }
+
+        // Reset the "Simulate Launch" button
+        launchButton.disabled = false;
+        launchButton.innerHTML = 'Simulate Launch';
 
         // Submit the form
         document.getElementById('form').submit();
