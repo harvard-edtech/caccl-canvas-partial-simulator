@@ -122,6 +122,10 @@
         if (data.error) {
           // Display error and stop fetching
           alert('An error occurred: ' + data.error + '\nPlease try again.');
+
+          // Reset the "Simulate Launch" button
+          launchButton.disabled = false;
+          launchButton.innerHTML = 'Simulate Launch';
           return;
         }
 
