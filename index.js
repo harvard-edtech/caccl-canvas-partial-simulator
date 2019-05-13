@@ -148,6 +148,17 @@ module.exports = (config = {}) => {
     accessToken: config.accessToken,
   });
 
+  // Redirect GET requests that aren't to the API
+  app.get('*', (req, res, next) => {
+    // Skip if this is an API call
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+
+    // Redirect to Canvas
+    return res.redirect(`https://${canvasHost}${req.originalUrl}`);
+  });
+
   // Initialize the API
   initAPIForwarding({
     app,
