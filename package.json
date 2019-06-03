@@ -24,7 +24,7 @@
   "homepage": "https://github.com/harvard-edtech/canvas-partial-simulator#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "caccl": "^1.0.79",
+    "caccl": "^1.0.80",
     "caccl-api-forwarder": "^1.0.6",
     "caccl-authorizer": "^1.0.17",
     "ejs": "^2.6.1",
