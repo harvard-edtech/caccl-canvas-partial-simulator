@@ -1,6 +1,6 @@
 {
   "name": "caccl-canvas-partial-simulator",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "Partially simulates a Canvas instance, handling OAuth token exchanges and forwarding API requests",
   "main": "index.js",
   "scripts": {
