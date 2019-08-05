@@ -76,12 +76,13 @@ module.exports = (config = {}) => {
 
   // Allow connections from localhost
   app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'localhost');
+    res.setHeader('Access-Control-Allow-Origin', 'localhost');
     res.setHeader('Access-Control-Allow-Credentials', true);
-    res.header(
+    res.setHeader(
       'Access-Control-Allow-Headers',
       'Origin, X-Requested-With, Content-Type, Accept'
     );
+    res.setHeader('Access-Control-Request-Headers', '*');
     next();
   });
 
