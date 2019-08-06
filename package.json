@@ -25,8 +25,8 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "caccl": "^1.0.80",
-    "caccl-api-forwarder": "^1.0.6",
-    "caccl-authorizer": "^1.0.17",
+    "caccl-api-forwarder": "^1.0.9",
+    "caccl-authorizer": "^1.0.19",
     "ejs": "^2.6.1",
     "express": "^4.17.1",
     "express-session": "^1.16.1",
@@ -37,13 +37,13 @@
   },
   "devDependencies": {
     "axios": "^0.19.0",
-    "cypress": "^3.3.1",
+    "cypress": "^3.4.1",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.0",
-    "eslint-plugin-cypress": "^2.2.1",
+    "eslint-plugin-cypress": "^2.6.1",
     "eslint-plugin-import": "^2.17.3",
     "eslint-plugin-jsx-a11y": "^6.2.1",
-    "eslint-plugin-react": "^7.13.0",
+    "eslint-plugin-react": "^7.14.3",
     "ims-lti": "^3.0.2",
     "mocha": "^5.2.0",
     "prompt-sync": "^4.1.7"
