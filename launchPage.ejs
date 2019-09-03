@@ -123,9 +123,9 @@
           // Display error and stop fetching
           alert('An error occurred: ' + data.error + '\nPlease try again.');
 
-          // Reset the "Simulate Launch" button
+          // Reset the "Simulate Nav Launch" button
           launchButton.disabled = false;
-          launchButton.innerHTML = 'Simulate Launch';
+          launchButton.innerHTML = 'Simulate Nav Launch';
           return;
         }
 
@@ -137,9 +137,9 @@
           document.getElementById('form').innerHTML += '<input type="hidden" name="' + prop + '" value="' + data[prop] + '">\n';
         }
 
-        // Reset the "Simulate Launch" button
+        // Reset the "Simulate Nav Launch" button
         launchButton.disabled = false;
-        launchButton.innerHTML = 'Simulate Launch';
+        launchButton.innerHTML = 'Simulate Nav Launch';
 
         // Submit the form
         document.getElementById('form').submit();
@@ -166,7 +166,7 @@
         <!-- Form content will be populated after GET -->
       </form>
       <button id="launch-button" type="button" onclick="submit()" class="launch-button">
-        Simulate Launch
+        Simulate Nav Launch
       </button>
     </div><!-- End Content -->
 
