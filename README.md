@@ -7,6 +7,13 @@ To remedy this situation, we've created this partial Canvas simulator. It simula
 
 All you need to get started is an `accessToken` (that will be returned from the oauth2 handshake) and a real `canvasHost` (the real Canvas instance we will forward non-oauth requests to).
 
+## Part of the CACCL library
+**C**anvas  
+**A**pp  
+**C**omplete  
+**C**onnection  
+**L**ibrary
+
 ## Setup:
 
 1. Initialize this Canvas simulation:
