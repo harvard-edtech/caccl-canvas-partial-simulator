@@ -164,6 +164,8 @@ module.exports = async () => {
 
   /* ------------------------ Pull profiles ----------------------- */
 
+  console.log('\nJust a moment...waiting on Canvas.\n');
+
   let instructorProfile;
   const studentProfiles = [];
   const taProfiles = [];
@@ -258,4 +260,38 @@ module.exports = async () => {
     console.log(`\nCould not start simulator because an error occurred: ${err.message}`);
     process.exit(0);
   });
+
+  /* --------------------- Print Start Message -------------------- */
+
+  // Printing helpers
+  const W = process.stdout.columns;
+  // Calculates the number of spaces on the left of a centered line
+  const leftBuffer = (message) => {
+    return (Math.floor(W / 2) - 1 - Math.ceil(message.length / 2));
+  };
+  // Calculates the number of spaces on the right of a centered line
+  const rightBuffer = (message) => {
+    return (Math.ceil(W / 2) - 1 - Math.floor(message.length / 2));
+  };
+  // Centers and surrounds text with a border (on left and right)
+  const printMiddleLine = (str) => {
+    console.log(
+      '\u2551'
+      + ' '.repeat(leftBuffer(str))
+      + str
+      + ' '.repeat(rightBuffer(str))
+      + '\u2551'
+    );
+  };
+
+  // Print top line
+  console.log('\u2554' + '\u2550'.repeat(W - 2) + '\u2557');
+
+  // Print middle lines
+  printMiddleLine('Partially-simulated Canvas environment running!');
+  printMiddleLine('To launch your app, visit:');
+  printMiddleLine(`https://localhost:${port}/simulator`);
+
+  // Print bottom line
+  console.log('\u255A' + '\u2550'.repeat(W - 2) + '\u255D');
 };
