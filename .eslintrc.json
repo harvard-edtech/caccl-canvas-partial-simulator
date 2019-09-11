@@ -55,6 +55,7 @@
     "react/prefer-stateless-function": "off",
     "react/jsx-filename-extension": "off",
     "no-underscore-dangle": "off",
+    "no-await-in-loop": "off",
     "max-params": [ "warn", { "max": 3 } ]
   }
 }

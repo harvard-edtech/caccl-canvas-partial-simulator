@@ -8,6 +8,11 @@ const bodyParser = require('body-parser');
 const https = require('https');
 const randomstring = require('randomstring');
 
+// Import CACCL
+const initCACCL = require('caccl/script');
+
+// Local modules
+const currentUser = require('./currentUser');
 const initLaunches = require('./initLaunches');
 const initOAuth = require('./initOAuth');
 
@@ -16,31 +21,49 @@ const initOAuth = require('./initOAuth');
 /**
  * Initialize a simulated Canvas environment that automatically responds to
  *   OAuth authorization requests and forwards all other requests
- * @author Gabriel Abrams
- * @param {string} accessToken - the access token to send to requester
- * @param {string} [canvasHost=canvas.instructure.com] - the Canvas host to
- *   forward requests to
- * @param {string} [consumerKey=consumer_key] - the consumer key of the
- *   installation for the created OAuth message
- * @param {string} [consumerSecret=consumer_secret] - the consumer secret of the
- *   installation so we can encrypt the OAuth message
- * @param {string} [launchURL=https://localhost/launch] - the url to visit for
- *   simulated LTI launches
- * @param {function} [onSuccess] - a handler function to call when the
- *   simulation has been started successfully
- * @param {boolean} [dontPrint] - if true, no console logs will be printed,
- *   except errors.
- * @return {object} {app, server} where app is the express app and server is the
- *   https server for the partially simulated Canvas instance
  */
 
-module.exports = (config = {}) => {
-  const { onSuccess } = config;
+module.exports = async () => {
+  /* -------------------- Config Pre-processing ------------------- */
 
+  // Read config file
+  // Attempt to get the environment config
+  const launchDirectory = process.env.INIT_CWD || process.env.PWD;
+  const devEnvPath = path.join(launchDirectory, 'config/devEnvironment.js');
+  let config;
+  try {
+    config = require(devEnvPath); // eslint-disable-line global-require, import/no-dynamic-require, max-len
+  } catch (err) {
+    // Could not read the dev environment!
+    console.log('\nNo /config/devEnvironment.js file found. Now quitting.');
+    process.exit(0);
+  }
+
+  // Set up default values and make sure required values exist
+  const canvasHost = config.canvasHost || 'canvas.instructure.com';
+  const students = config.students || [];
+  const tas = config.tas || [];
+  const launchURL = config.launchURL || 'https://localhost/launch';
+  const consumerKey = config.consumerKey || 'consumer_key';
+  const consumerSecret = config.consumerSecret || 'consumer_secret';
+  const { accessToken } = config;
+  if (!accessToken) {
+    // No default user
+    console.log('\nNo instructor access token found in /config/devEnvironment.js. Now quitting.');
+    process.exit(0);
+  }
+  const { courseId } = config;
+  if (!courseId) {
+    // No course
+    console.log('\nNo courseId found in /config/devEnvironment.js. Now quitting.');
+    process.exit(0);
+  }
+
+  /* --------------------------- Express -------------------------- */
+
+  // Set up Express
   const app = express();
   const port = 8088;
-
-  const canvasHost = config.canvasHost || 'canvas.instructure.com';
 
   // Set up ejs
   app.set('view engine', 'ejs');
@@ -86,15 +109,15 @@ module.exports = (config = {}) => {
     next();
   });
 
-  // Start Server
+  /* ------------------------ Self Signing ------------------------ */
+
   // Use self-signed certificates
   const sslKey = path.join(__dirname, 'ssl/key.pem');
   const sslCertificate = path.join(__dirname, 'ssl/cert.pem');
 
-  if (!config.dontPrint) {
-    console.log('\nNote: we\'re using a self-signed certificate!');
-    console.log(`- Please visit https://localhost:${port}/verifycert to make sure the certificate is accepted by your browser\n`);
-  }
+  // Self-signed notice
+  console.log('\nNote: we\'re using a self-signed certificate!');
+  console.log(`- Please visit https://localhost:${port}/verifycert to make sure the certificate is accepted by your browser\n`);
 
   // Add route for verifying self-signed certificate
   app.get('/verifycert', (req, res) => {
@@ -115,39 +138,88 @@ module.exports = (config = {}) => {
     cert = sslCertificate;
   }
 
-  // Start HTTPS server
-  const server = https.createServer({
-    key,
-    cert,
-  }, app);
-  server.listen(port, (err) => {
-    if (err) {
-      if (!config.dontPrint) {
-        console.log(`An error occurred while trying to listen and use SSL on port ${port}:`, err);
-      }
-    } else if (onSuccess) {
-      onSuccess(port);
-    } else if (!config.dontPrint) {
-      console.log(`Now partially simulating Canvas on port ${port}`);
-    }
+  /* -------------------- Create API Instances -------------------- */
+
+  // Create a main API object
+  const instructorAPI = initCACCL({
+    canvasHost,
+    accessToken,
   });
 
+  // Create API objects for each student
+  const studentAPIs = (students || []).map((studentAccessToken) => {
+    return initCACCL({
+      canvasHost,
+      accessToken: studentAccessToken,
+    });
+  });
+
+  // Create API objects for each TA
+  const taAPIs = (tas || []).map((taAccessToken) => {
+    return initCACCL({
+      canvasHost,
+      accessToken: taAccessToken,
+    });
+  });
+
+  /* ------------------------ Pull profiles ----------------------- */
+
+  let instructorProfile;
+  const studentProfiles = [];
+  const taProfiles = [];
+  try {
+    // Instructor profile
+    instructorProfile = await instructorAPI.user.self.getProfile();
+
+    // Student profiles
+    for (let i = 0; i < studentAPIs.length; i++) {
+      studentProfiles.push(await studentAPIs[i].user.self.getProfile());
+    }
+
+    // TA profiles
+    for (let i = 0; i < taAPIs.length; i++) {
+      taProfiles.push(await taAPIs[i].user.self.getProfile());
+    }
+  } catch (err) {
+    console.log(`\nAn error occurred while attempting to get user profiles: ${err.message}. Now exiting.`);
+    process.exit(0);
+  }
+
+  /* ------------- Store Data for Current User Lookup ------------- */
+
+  currentUser.addData({
+    accessToken,
+    instructorAPI,
+    instructorProfile,
+    tas,
+    taAPIs,
+    taProfiles,
+    students,
+    studentAPIs,
+    studentProfiles,
+  });
+
+  /* --------------------- Initialize Services -------------------- */
+
   // Initialize LTI launches
-  initLaunches({
+  await initLaunches({
     app,
-    canvasHost,
-    accessToken: config.accessToken,
-    launchURL: config.launchURL || 'https://localhost/launch',
-    consumerKey: config.consumerKey || 'consumer_key',
-    consumerSecret: config.consumerSecret || 'consumer_secret',
+    courseId,
+    launchURL,
+    consumerKey,
+    consumerSecret,
+    instructorAPI,
+    instructorProfile,
+    taAPIs,
+    taProfiles,
+    studentAPIs,
+    studentProfiles,
   });
 
   // Initialize OAuth
-  initOAuth({
-    app,
-    canvasHost,
-    accessToken: config.accessToken,
-  });
+  initOAuth({ app });
+
+  /* ----------------- Initialize Canvas Redirects ---------------- */
 
   // Redirect GET requests that aren't to the API
   app.get('*', (req, res, next) => {
@@ -168,8 +240,22 @@ module.exports = (config = {}) => {
     numRetries: 1,
   });
 
-  return {
-    app,
-    server,
-  };
+  /* ------------------------ Start Server ------------------------ */
+
+  // Start HTTPS server
+  const server = https.createServer({
+    key,
+    cert,
+  }, app);
+
+  server.listen(port);
+  server.on('error', (err) => {
+    if (err.message.includes('EADDRINUSE')) {
+      console.log('\nThe Canvas simulator needs port 8088 but that port is taken. Now quitting.');
+      process.exit(0);
+    }
+
+    console.log(`\nCould not start simulator because an error occurred: ${err.message}`);
+    process.exit(0);
+  });
 };

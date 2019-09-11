@@ -4,7 +4,17 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Choose Course</title>
+  <title>Create Assignment</title>
+
+  <!-- jQuery -->
+  <script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+
+  <!-- Bootstrap -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
   <!-- Import google font to match Canvas authorization page font -->
   <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
@@ -22,7 +32,7 @@
     }
 
     /* Container so the course chooser won't span the whole width of the page */
-    .container {
+    .page-container {
       margin-left: 30px;
       margin-right: 30px;
       margin-top: 10px;
@@ -63,7 +73,7 @@
     }
 
     /* Lower portion of the page, white background, the content: course list */
-    .content {
+    .content-container {
       background-color: white;
       border-radius: 0 0 5px 5px;
 
@@ -72,94 +82,28 @@
       padding-top: 10px;
       padding-bottom: 10px;
     }
-
-    /* Authorize button) */
-    .authorize-button {
-      display: block;
-      background-color: #3b8edc;
-      color: white;
-      font-weight: bold;
-      border-radius: 5px;
-      padding-left: 15px;
-      padding-right: 15px;
-      padding-top: 20px;
-      padding-bottom: 20px;
-      margin-bottom: 10px;
-      text-decoration: none;
-      text-align: center;
-      border: 1px solid gray;
-    }
-
-    /* Highlight the authorize button on hover */
-    .authorize-button:hover {
-      background-color: #48a8f0;
-    }
-
-    /* Cancel button) */
-    .cancel-button {
-      display: block;
-      background-color: #f5f5f5;
-      color: black;
-      font-weight: bold;
-      border-radius: 5px;
-      padding-left: 15px;
-      padding-right: 15px;
-      padding-top: 20px;
-      padding-bottom: 20px;
-      margin-bottom: 10px;
-      text-decoration: none;
-      text-align: center;
-      margin-top: 20px;
-      border: 1px solid gray;
-    }
-
-    /* Highlight the cancel button on hover */
-    .cancel-button:hover {
-      background-color: #e8e8e8;
-    }
-
-    /* Large app title */
-    .app-title {
-      font-size: 1.5em;
-      margin-bottom: 10px;
-    }
   </style>
-
 </head>
 
 <body>
-
   <!-- Page content -->
-  <div class="container">
+  <div class="page-container">
 
     <!-- Header (title and subtitle) -->
     <div class="header">
-      <div class="title">Canvas</div>
-      <div class="subtitle">(simulated)</div>
+      <div class="title">Assignment Created!</div>
+      <div class="subtitle">The assignment has been added to your test course.</div>
     </div>
 
-    <!-- Content (list of courses) -->
-    <div class="content">
-      <div class="app-title">
-        Unnamed LTI App
-      </div>
-      <div style="margin-bottom: 5px;">
-        <strong>Unnamed LTI App is requesting access to your account.</strong>
-      </div>
-      <div>
-        You are authorizing this app as <%= user.name || 'Simulated Name' %>.
-      </div>
-      <div>
-        Your email address is simulated@email.com.
-      </div>
-
-      <a class="cancel-button" href="<%= cancelURL %>">
-        Cancel
+    <div class="content-container">
+      <a
+        role="button"
+        class="btn btn-secondary btn-block btn-lg"
+        href="/simulator"
+      >
+        Okay
       </a>
-      <a class="authorize-button" href="<%= approveURL %>">
-        Authorize
-      </a>
-    </div><!-- End Content -->
+    </div>
 
   </div><!-- End Container -->
 

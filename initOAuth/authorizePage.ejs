@@ -4,13 +4,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Launch</title>
-
-  <!-- jQuery -->
-  <script
-    src="https://code.jquery.com/jquery-3.3.1.min.js"
-    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-    crossorigin="anonymous"></script>
+  <title>App Login</title>
 
   <!-- Import google font to match Canvas authorization page font -->
   <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
@@ -80,7 +74,7 @@
     }
 
     /* Authorize button) */
-    .launch-button {
+    .authorize-button {
       display: block;
       background-color: #3b8edc;
       color: white;
@@ -94,58 +88,42 @@
       text-decoration: none;
       text-align: center;
       border: 1px solid gray;
-      font-size: 1.2em;
-      width: 100%;
     }
 
     /* Highlight the authorize button on hover */
-    .launch-button:hover {
+    .authorize-button:hover {
       background-color: #48a8f0;
     }
 
-    /* Gray out the launch button when it's disabled */
-    .launch-button:disabled {
-      background-color: gray;
-      pointer-events: none;
+    /* Cancel button) */
+    .cancel-button {
+      display: block;
+      background-color: #f5f5f5;
+      color: black;
+      font-weight: bold;
+      border-radius: 5px;
+      padding-left: 15px;
+      padding-right: 15px;
+      padding-top: 20px;
+      padding-bottom: 20px;
+      margin-bottom: 10px;
+      text-decoration: none;
+      text-align: center;
+      margin-top: 20px;
+      border: 1px solid gray;
+    }
+
+    /* Highlight the cancel button on hover */
+    .cancel-button:hover {
+      background-color: #e8e8e8;
+    }
+
+    /* Large app title */
+    .app-title {
+      font-size: 1.5em;
+      margin-bottom: 10px;
     }
   </style>
-
-  <script type="text/javascript">
-    function submit() {
-      // Indicate to user that the click has registered
-      var launchButton = document.getElementById('launch-button');
-      launchButton.disabled = true;
-      launchButton.innerHTML = 'Waiting on Canvas...';
-
-      // Make a new call to get new launch info
-      $.get('<%= launchDataURL %>', function (data) {
-        if (data.error) {
-          // Display error and stop fetching
-          alert('An error occurred: ' + data.error + '\nPlease try again.');
-
-          // Reset the "Simulate Nav Launch" button
-          launchButton.disabled = false;
-          launchButton.innerHTML = 'Simulate Nav Launch';
-          return;
-        }
-
-        // Create form fields
-        document.getElementById('form').innerHTML = '';
-
-        // Update the launch form with the new data
-        for (var prop in data) {
-          document.getElementById('form').innerHTML += '<input type="hidden" name="' + prop + '" value="' + data[prop] + '">\n';
-        }
-
-        // Reset the "Simulate Nav Launch" button
-        launchButton.disabled = false;
-        launchButton.innerHTML = 'Simulate Nav Launch';
-
-        // Submit the form
-        document.getElementById('form').submit();
-      });
-    }
-  </script>
 
 </head>
 
@@ -156,18 +134,28 @@
 
     <!-- Header (title and subtitle) -->
     <div class="header">
-      <div class="title">Simulated LTI Launch</div>
-      <div class="subtitle">click to simulate an LTI launch</div>
+      <div class="title">Canvas</div>
+      <div class="subtitle">(simulated)</div>
     </div>
 
     <!-- Content (list of courses) -->
     <div class="content">
-      <form action="<%= launchURL %>" method="POST" id="form">
-        <!-- Form content will be populated after GET -->
-      </form>
-      <button id="launch-button" type="button" onclick="submit()" class="launch-button">
-        Simulate Nav Launch
-      </button>
+      <div class="app-title">
+        CACCL Simulated App
+      </div>
+      <div style="margin-bottom: 5px;">
+        <strong>CACCL Simulated App is requesting access to your account.</strong>
+      </div>
+      <div>
+        You are authorizing this app as <%= user.name || 'Simulated Name' %>.
+      </div>
+
+      <a class="cancel-button" href="<%= cancelURL %>">
+        Cancel
+      </a>
+      <a class="authorize-button" href="<%= approveURL %>">
+        Authorize
+      </a>
     </div><!-- End Content -->
 
   </div><!-- End Container -->

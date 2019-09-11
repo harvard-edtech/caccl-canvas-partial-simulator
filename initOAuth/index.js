@@ -1,46 +1,50 @@
 const path = require('path');
-const initCACCL = require('caccl/script');
 
-const codes = {};
+const currentUser = require('../currentUser');
 
-const REFRESH_TOKEN = 'dskfur392nbfassfdlkjanseflkjsdfow';
 const CLIENT_ID = 'client_id';
 const CLIENT_SECRET = 'client_secret';
 
-const genCode = () => {
-  const nextCode = Date.now();
-  codes[nextCode] = true;
-  return nextCode;
+// Code Generation
+const genCode = (group, index) => {
+  return `simulated-oauth-code-${group}-${index}`;
 };
 
+// Refresh Token Generation
+const genRefreshToken = (group, index) => {
+  return `simulated-refresh-token-${group}-${index}`;
+};
+const parseRefreshToken = (code) => {
+  const parts = code.split('-');
+  if (parts.length !== 5) {
+    return null;
+  }
+  return {
+    group: parts[3],
+    index: parseInt(parts[4]),
+  };
+};
+
+// Keep track of token expiry
+const tokenExpiry = {}; // token => ms expiry timestamp
+const resetTokenExpiry = (token) => {
+  tokenExpiry[token] = Date.now() + 3600000;
+};
+const tokenIsValid = (token) => {
+  if (!tokenExpiry[token]) {
+    return false;
+  }
+  return (tokenExpiry[token] > Date.now());
+};
+
+/**
+ * Initializes simulated LTI launch functionality
+ * @param {object} app - the express app to add routes to
+ */
 module.exports = (config) => {
-  // Get information on the current user
-  let user;
-  const api = initCACCL({
-    canvasHost: config.canvasHost,
-    accessToken: config.accessToken,
-  });
-  api.user.self.getProfile()
-    .then((profile) => {
-      user = profile;
-    })
-    .catch(() => {
-      user = {};
-    });
+  const { app } = config;
 
-  // Add token expiry countdown
-  let tokenExpiry;
-  const tokenIsValid = () => {
-    if (!tokenExpiry) {
-      return false;
-    }
-    return tokenExpiry > Date.now();
-  };
-  const resetTokenExpiry = () => {
-    tokenExpiry = Date.now() + 3600000;
-  };
-
-  config.app.get('/login/oauth2/auth', (req, res) => {
+  app.get('/login/oauth2/auth', (req, res) => {
     const { state } = req.query;
     const redirectURI = req.query.redirect_uri;
 
@@ -59,18 +63,25 @@ module.exports = (config) => {
       return res.redirect(`${redirectURI}?error=unsupported_response_type&error_description=Only+response_type%3Dcode+is+permitted`);
     }
 
+    // Get the current user
+    const user = currentUser.get();
+    if (!user) {
+      return res.send('while(1);{"error":"invalid_client","error_description":"unknown client"}');
+    }
+    const { group, index } = user;
+
     // Generate a code
-    const code = genCode();
+    const code = genCode(group, index);
 
     // Show authorize page
-    res.render(path.join(__dirname, 'authorizePage.ejs'), {
+    res.render(path.join(__dirname, 'authorizePage'), {
       user: user || {},
       cancelURL: `${redirectURI}?error=access_denied`,
       approveURL: `${redirectURI}?code=${code}&state=${state}`,
     });
   });
 
-  config.app.post('/login/oauth2/token', (req, res) => {
+  app.post('/login/oauth2/token', (req, res) => {
     // Handle code-based authorization request
     if (req.body.grant_type === 'authorization_code') {
       if (CLIENT_ID !== req.body.client_id) {
@@ -85,24 +96,44 @@ module.exports = (config) => {
           error_description: 'invalid client',
         });
       }
-      if (!codes[req.body.code]) {
+
+      // Make sure the code is valid
+      const user = currentUser.get();
+      if (!user) {
+        return res.status(401).json({
+          error: 'invalid_client',
+          error_description: 'unknown client',
+        });
+      }
+      const {
+        group,
+        index,
+        token,
+        profile,
+      } = user;
+      if (genCode(group, index) !== req.body.code) {
         return res.status(400).json({
           error: 'invalid_grant',
           error_description: 'authorization_code not found',
         });
       }
-      delete codes[req.body.code];
 
-      resetTokenExpiry();
+      // Reset the expiry time
+      resetTokenExpiry(token);
+
+      // Generate a refresh token
+      const refreshToken = genRefreshToken(group, index);
+
+      // Respond to the request
       return res.json({
-        access_token: config.accessToken,
-        refresh_token: REFRESH_TOKEN,
+        access_token: token,
+        refresh_token: refreshToken,
         expires_in: 3600,
         token_type: 'Bearer',
         user:
           {
-            id: user.id,
-            name: user.name,
+            id: profile.id,
+            name: profile.name,
             global_id: null,
             effective_locale: 'en',
           },
@@ -111,6 +142,7 @@ module.exports = (config) => {
 
     // Handle refresh token request
     if (req.body.grant_type === 'refresh_token') {
+      // Make sure the credentials are valid
       if (CLIENT_ID !== req.body.client_id) {
         return res.status(401).json({
           error: 'invalid_client',
@@ -123,22 +155,39 @@ module.exports = (config) => {
           error_description: 'invalid client',
         });
       }
-      if (req.body.refresh_token !== REFRESH_TOKEN) {
+
+      // Parse the refresh token
+      const data = parseRefreshToken(req.body.refresh_token);
+      if (!data || !data.group) {
         return res.status(400).json({
           error: 'invalid_grant',
           error_description: 'authorization_code not found',
         });
       }
+      const { group, index } = data;
 
-      resetTokenExpiry();
+      // Get the access token
+      const user = currentUser.get(group, index);
+      if (!user) {
+        return res.status(401).json({
+          error: 'invalid_client',
+          error_description: 'invalid client',
+        });
+      }
+      const { token, profile } = user;
+
+      // Reset expiry
+      resetTokenExpiry(token);
+
+      // Respond to request
       return res.json({
-        access_token: config.accessToken,
+        access_token: token,
         expires_in: 3600,
         token_type: 'Bearer',
         user:
           {
-            id: user.id,
-            name: user.name,
+            id: profile.id,
+            name: profile.name,
             global_id: null,
             effective_locale: 'en',
           },
@@ -150,8 +199,8 @@ module.exports = (config) => {
   });
 
   // Simulate process of token expiring
-  config.app.all('*', (req, res, next) => {
-    if (req.body.access_token && !tokenIsValid()) {
+  app.all('*', (req, res, next) => {
+    if (req.body.access_token && !tokenIsValid(req.body.access_token)) {
       req.body.access_token = 'invalid_access_token';
     }
     next();
