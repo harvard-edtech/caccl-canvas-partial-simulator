@@ -7,6 +7,8 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const https = require('https');
 const randomstring = require('randomstring');
+const parallelLimit = require('async/parallelLimit');
+const clear = require('clear');
 
 // Import CACCL
 const initCACCL = require('caccl/script');
@@ -15,6 +17,8 @@ const initCACCL = require('caccl/script');
 const currentUser = require('./currentUser');
 const initLaunches = require('./initLaunches');
 const initOAuth = require('./initOAuth');
+
+const MAX_NUM_TASKS = 15;
 
 /* eslint-disable no-console */
 
@@ -115,15 +119,6 @@ module.exports = async () => {
   const sslKey = path.join(__dirname, 'ssl/key.pem');
   const sslCertificate = path.join(__dirname, 'ssl/cert.pem');
 
-  // Self-signed notice
-  console.log('\nNote: we\'re using a self-signed certificate!');
-  console.log(`- Please visit https://localhost:${port}/verifycert to make sure the certificate is accepted by your browser\n`);
-
-  // Add route for verifying self-signed certificate
-  app.get('/verifycert', (req, res) => {
-    return res.send('Certificate accepted!');
-  });
-
   // Read in files if they're not already read in
   let key;
   try {
@@ -164,28 +159,59 @@ module.exports = async () => {
 
   /* ------------------------ Pull profiles ----------------------- */
 
-  console.log('\nJust a moment...waiting on Canvas.\n');
+  // Keep track of tasks and provide a loading bar
+  let tasksFinished;
+  process.stdout.write('Loading from Canvas');
+  const updateLoadingBar = () => {
+    if (!tasksFinished) {
+      process.stdout.write('.');
+      setTimeout(updateLoadingBar, 200);
+    }
+  };
+  updateLoadingBar();
 
   let instructorProfile;
   const studentProfiles = [];
   const taProfiles = [];
   try {
-    // Instructor profile
-    instructorProfile = await instructorAPI.user.self.getProfile();
+    const tasks = [];
 
-    // Student profiles
-    for (let i = 0; i < studentAPIs.length; i++) {
-      studentProfiles.push(await studentAPIs[i].user.self.getProfile());
-    }
+    const addTask = (api, type) => {
+      tasks.push(async () => {
+        const profile = await api.user.self.getProfile();
+        if (type === 'instructor') {
+          instructorProfile = profile;
+        } else if (type === 'student') {
+          studentProfiles.push(profile);
+        } else {
+          taProfiles.push(profile);
+        }
+      });
+    };
 
-    // TA profiles
-    for (let i = 0; i < taAPIs.length; i++) {
-      taProfiles.push(await taAPIs[i].user.self.getProfile());
-    }
+    // Add instructor task
+    addTask(instructorAPI, 'instructor');
+
+    // Add student tasks
+    studentAPIs.forEach((api) => {
+      addTask(api, 'student');
+    });
+
+    // Add TA tasks
+    taAPIs.forEach((api) => {
+      addTask(api, 'ta');
+    });
+
+    // Run all tasks
+    await parallelLimit(tasks, MAX_NUM_TASKS);
   } catch (err) {
     console.log(`\nAn error occurred while attempting to get user profiles: ${err.message}. Now exiting.`);
     process.exit(0);
   }
+
+  // End loading bar
+  tasksFinished = true;
+  console.log('');
 
   /* ------------- Store Data for Current User Lookup ------------- */
 
@@ -262,36 +288,42 @@ module.exports = async () => {
   });
 
   /* --------------------- Print Start Message -------------------- */
+  server.on('listening', () => {
+    // Clear the terminal
+    clear();
 
-  // Printing helpers
-  const W = process.stdout.columns;
-  // Calculates the number of spaces on the left of a centered line
-  const leftBuffer = (message) => {
-    return (Math.floor(W / 2) - 1 - Math.ceil(message.length / 2));
-  };
-  // Calculates the number of spaces on the right of a centered line
-  const rightBuffer = (message) => {
-    return (Math.ceil(W / 2) - 1 - Math.floor(message.length / 2));
-  };
-  // Centers and surrounds text with a border (on left and right)
-  const printMiddleLine = (str) => {
-    console.log(
-      '\u2551'
-      + ' '.repeat(leftBuffer(str))
-      + str
-      + ' '.repeat(rightBuffer(str))
-      + '\u2551'
-    );
-  };
+    // Printing helpers
+    const W = process.stdout.columns;
+    // Calculates the number of spaces on the left of a centered line
+    const leftBuffer = (message) => {
+      return (Math.floor(W / 2) - 1 - Math.ceil(message.length / 2));
+    };
+    // Calculates the number of spaces on the right of a centered line
+    const rightBuffer = (message) => {
+      return (Math.ceil(W / 2) - 1 - Math.floor(message.length / 2));
+    };
+    // Centers and surrounds text with a border (on left and right)
+    const printMiddleLine = (str) => {
+      console.log(
+        '\u2551'
+        + ' '.repeat(leftBuffer(str))
+        + str
+        + ' '.repeat(rightBuffer(str))
+        + '\u2551'
+      );
+    };
 
-  // Print top line
-  console.log('\u2554' + '\u2550'.repeat(W - 2) + '\u2557');
+    // Print top line
+    console.log('\u2554' + '\u2550'.repeat(W - 2) + '\u2557');
 
-  // Print middle lines
-  printMiddleLine('Partially-simulated Canvas environment running!');
-  printMiddleLine('To launch your app, visit:');
-  printMiddleLine(`https://localhost:${port}/simulator`);
+    // Print middle lines
+    printMiddleLine('Partially-simulated Canvas environment running!');
+    printMiddleLine('To launch your app, visit:');
+    printMiddleLine(`https://localhost:${port}/simulator`);
 
-  // Print bottom line
-  console.log('\u255A' + '\u2550'.repeat(W - 2) + '\u255D');
+    // Print bottom line
+    console.log('\u255A' + '\u2550'.repeat(W - 2) + '\u255D');
+
+    console.log('\nYou may need to accept our self-signed certificate.');
+  });
 };
