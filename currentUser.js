@@ -27,7 +27,11 @@ module.exports = {
   get: (userGroup, userIndex) => {
     const groupActual = userGroup || group;
     const indexActual = userIndex || index;
-    if (!groupActual || !indexActual || !accessToken) {
+    if (
+      !groupActual
+      || (indexActual === undefined || indexActual === null)
+      || !accessToken
+    ) {
       return null;
     }
     if (groupActual === 'instructor') {

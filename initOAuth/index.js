@@ -75,7 +75,11 @@ module.exports = (config) => {
 
     // Show authorize page
     res.render(path.join(__dirname, 'authorizePage'), {
-      user: user || {},
+      name: (
+        (user && user.profile && user.profile.name)
+          ? user.profile.name
+          : 'a test user'
+      ),
       cancelURL: `${redirectURI}?error=access_denied`,
       approveURL: `${redirectURI}?code=${code}&state=${state}`,
     });

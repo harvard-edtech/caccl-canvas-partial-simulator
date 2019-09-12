@@ -18,7 +18,10 @@ const currentUser = require('./currentUser');
 const initLaunches = require('./initLaunches');
 const initOAuth = require('./initOAuth');
 
+/* -------------------------- Constants ------------------------- */
+
 const MAX_NUM_TASKS = 15;
+const DEFAULT_APP_NAME = 'CACCL Simulated App';
 
 /* eslint-disable no-console */
 
@@ -50,6 +53,7 @@ module.exports = async () => {
   const launchURL = config.launchURL || 'https://localhost/launch';
   const consumerKey = config.consumerKey || 'consumer_key';
   const consumerSecret = config.consumerSecret || 'consumer_secret';
+  const appName = config.appName || DEFAULT_APP_NAME;
   const { accessToken } = config;
   if (!accessToken) {
     // No default user
@@ -209,9 +213,21 @@ module.exports = async () => {
     process.exit(0);
   }
 
+  // Sort the lists
+  const comparator = (a, b) => {
+    if (a.sortable_name < b.sortable_name) {
+      return -1;
+    }
+    if (a.sortable_name > b.sortable_name) {
+      return 1;
+    }
+    return 0;
+  };
+  studentProfiles.sort(comparator);
+  taProfiles.sort(comparator);
+
   // End loading bar
   tasksFinished = true;
-  console.log('');
 
   /* ------------- Store Data for Current User Lookup ------------- */
 
@@ -232,6 +248,7 @@ module.exports = async () => {
   // Initialize LTI launches
   await initLaunches({
     app,
+    appName,
     courseId,
     launchURL,
     consumerKey,

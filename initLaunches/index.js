@@ -1,15 +1,14 @@
-const initCACCL = require('caccl/script');
 const path = require('path');
 const fs = require('fs');
 
 const currentUser = require('../currentUser');
 
 /* eslint-disable no-console */
-const APP_NAME = 'CACCL Simulated App'; // Also change in install.xml
 
 /**
  * Initializes simulated LTI launch functionality
  * @param {object} app - the express app to add routes to
+ * @param {string} appName - the name of the app
  * @param {number} courseId - the id of the test Canvas course
  * @param {string} launchURL - the URL to launch to when simulating an LTI
  *   launch
@@ -36,6 +35,7 @@ module.exports = async (config) => {
   // Deconstruct config
   const {
     app,
+    appName,
     courseId,
     launchURL,
     consumerKey,
@@ -57,7 +57,7 @@ module.exports = async (config) => {
     // Search for simulated app
     for (let i = 0; i < apps.length; i++) {
       if (
-        apps[i].name === APP_NAME
+        apps[i].name === appName
         && apps[i].url === launchURL
       ) {
         // Found the app!
@@ -74,17 +74,18 @@ module.exports = async (config) => {
         fs
           .readFileSync(installXMLPath, 'utf-8')
           .replace(/LAUNCHURL/g, launchURL)
+          .replace(/APPNAME/g, appName)
+          .replace(/APPDESCRIPTION/g, 'A CACCL-based test app.')
       );
 
       // Create the app
       simApp = await instructorAPI.course.app.add({
         courseId,
-        name: APP_NAME,
+        name: appName,
         key: consumerKey,
         secret: consumerSecret,
         xml: installXML,
       });
-      console.log(consumerKey, consumerSecret, simApp);
     }
   } catch (err) {
     console.log(`\nAn error occurred while we were setting up the test course with a simulatable LTI app: ${err.message} Now exiting.`);

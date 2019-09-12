@@ -126,6 +126,7 @@
   </style>
 
   <script type="text/javascript">
+    /* ---------------------- Assignment Modal ---------------------- */
     var assignments = <%- JSON.stringify(assignments || []) %>;
     function showAssignments(group, index) {
       // Create the assignment options
@@ -147,6 +148,64 @@
     }
     function hideAssignments() {
       $('#assignment-modal').modal('hide');
+    }
+
+    /* --------------------------- Search --------------------------- */
+    var taProfiles = <%- JSON.stringify(taProfiles) %>;
+    var studentProfiles = <%- JSON.stringify(studentProfiles) %>;
+    function updateSearch(type) {
+      var query = document.getElementById(type + '-query').value.toLowerCase().trim();
+      console.log('hi', query);
+
+      var profiles = (
+        (type === 'ta')
+          ? taProfiles
+          : studentProfiles
+      );
+
+      // Loop through and hide/show based on search query
+      var i;
+      var numShown = 0;
+      for (i = 0; i < profiles.length; i++) {
+        var profile = profiles[i];
+        var showThisOne;
+        if (query.length === 0) {
+          // No query. Show them all!
+          showThisOne = true;
+        } else {
+          // Filter by name or Canvas id
+          showThisOne = (
+            profile.name.toLowerCase().includes(query)
+            || profile.sortable_name.toLowerCase().includes(query)
+            || String(profile.id).includes(query)
+          );
+        }
+
+        // Show/hide
+        var selector = (
+          (type === 'ta')
+            ? '#ta-' + i
+            : '#student-' + i
+        );
+        if (showThisOne) {
+          $(selector).show(50);
+          numShown += 1;
+        } else {
+          $(selector).hide(50);
+        }
+      }
+
+      // Show/hide the "none found" message
+      var selector = (
+        (type === 'ta')
+          ? '#ta-none'
+          : '#student-none'
+      );
+      if (numShown === 0) {
+        $(selector).show(50);
+      } else {
+        $(selector).hide(50);
+      }
     }
   </script>
 </head>
@@ -218,9 +277,32 @@
       <% if (taProfiles.length > 0) { %>
         <h3 class="mt-2">TAs:</h3>
 
+        <!-- Search -->
+        <% if (taProfiles.length > 4) { %>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Search:</span>
+            </div>
+            <input
+              type="text"
+              id="ta-query"
+              class="form-control"
+              aria-label="Search TAs"
+              oninput="updateSearch('ta');"
+            >
+          </div>
+
+          <div class="alert alert-warning" style="display: none" id="ta-none">
+            <div>
+              <strong>No TAs found</strong>
+            </div>
+            Please broaden your search.
+          </div>
+        <% } %>
+
         <div class="scrollpane">
           <% taProfiles.forEach((ta, i) => { %>
-            <div class="person">
+            <div class="person" id="ta-<%= i %>">
               <div class="person-label">
                 <div class="person-title">
                   <%= ta.name %>
@@ -252,9 +334,32 @@
       <% if (studentProfiles.length > 0) { %>
         <h3 class="mt-2">Students:</h3>
 
+        <!-- Search -->
+        <% if (studentProfiles.length > 4) { %>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Search:</span>
+            </div>
+            <input
+              type="text"
+              id="student-query"
+              class="form-control"
+              aria-label="Search Students"
+              oninput="updateSearch('student');"
+            >
+          </div>
+
+          <div class="alert alert-warning" style="display: none" id="student-none">
+            <div>
+              <strong>No students found</strong>
+            </div>
+            Please broaden your search.
+          </div>
+        <% } %>
+
         <div class="scrollpane">
           <% studentProfiles.forEach((student, i) => { %>
-            <div class="person">
+            <div class="person" id="student-<%= i %>">
               <div class="person-label">
                 <div class="person-title">
                   <%= student.name %>
