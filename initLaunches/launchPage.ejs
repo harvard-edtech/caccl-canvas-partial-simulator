@@ -155,7 +155,6 @@
     var studentProfiles = <%- JSON.stringify(studentProfiles) %>;
     function updateSearch(type) {
       var query = document.getElementById(type + '-query').value.toLowerCase().trim();
-      console.log('hi', query);
 
       var profiles = (
         (type === 'ta')
