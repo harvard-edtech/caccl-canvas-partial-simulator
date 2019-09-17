@@ -75,9 +75,7 @@ Follow instructions in terminal.
 4. Write a script to start the simulator, then run your script:
 
     ```js
-    const initPartialSimulation = require('caccl-canvas-partial-simulator');
-
-    initPartialSimulation();
+    require('caccl-canvas-partial-simulator');
     ```
 
 5. Follow instructions in terminal.
