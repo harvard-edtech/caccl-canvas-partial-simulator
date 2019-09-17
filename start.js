@@ -354,15 +354,18 @@ module.exports = async () => {
       );
     };
 
-    // Print top line
+    // Print start message
+    printMiddleLine('Partially-simulated Canvas environment running!');
+    console.log('');
+
+    // Print top of box
     console.log('\u2554' + '\u2550'.repeat(W - 2) + '\u2557');
 
     // Print middle lines
-    printMiddleLine('Partially-simulated Canvas environment running!');
     printMiddleLine('To launch your app, visit:');
     printMiddleLine(`https://localhost:${port}/simulator`);
 
-    // Print bottom line
+    // Print bottom of box
     console.log('\u255A' + '\u2550'.repeat(W - 2) + '\u255D');
 
     console.log('\nYou may need to accept our self-signed certificate.');
