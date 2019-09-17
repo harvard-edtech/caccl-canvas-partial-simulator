@@ -355,8 +355,7 @@ module.exports = async () => {
     };
 
     // Print start message
-    printMiddleLine('Partially-simulated Canvas environment running!');
-    console.log('');
+    console.log('Partially-simulated Canvas environment running!\n');
 
     // Print top of box
     console.log('\u2554' + '\u2550'.repeat(W - 2) + '\u2557');
