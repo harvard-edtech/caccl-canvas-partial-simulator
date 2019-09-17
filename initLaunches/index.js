@@ -197,6 +197,9 @@ module.exports = async (config) => {
       return res.send('Oops! We could not launch as the user you selected. We could not find their credentials.');
     }
 
+    // Save the current user
+    currentUser.set(req.params.group, parseInt(req.params.index));
+
     // Simulate a launch
     if (isNavLaunch) {
       // Simulate a nav launch
@@ -221,9 +224,6 @@ module.exports = async (config) => {
             appId: simApp.id,
           })
         );
-
-        // Save the current user
-        currentUser.set(req.params.group, parseInt(req.params.index));
 
         // Send user to the launch URL
         return res.redirect(sessionlessLaunchURL);
