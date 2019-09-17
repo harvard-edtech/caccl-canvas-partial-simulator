@@ -145,6 +145,30 @@ module.exports = async () => {
     accessToken,
   });
 
+  // Verify that this API is an instructor
+  try {
+    // Pull Canvas info
+    const [
+      studentObjects,
+      profile,
+    ] = await Promise.all([
+      instructorAPI.course.listStudents({ courseId }),
+      instructorAPI.user.self.getProfile(),
+    ]);
+
+    const instructorId = profile.id;
+    for (let i = 0; i < studentObjects.length; i++) {
+      if (studentObjects[i].id === instructorId) {
+        // The "instructor" is a student!
+        console.log('\nOops! The main access token in your /config/devEnvironment.js belongs to a student in the course. The main access token must belong to an instructor in the course.');
+        process.exit(0);
+      }
+    }
+  } catch (err) {
+    console.log(`\nOops! An error occurred while attempting to verify the instructor API: ${err.message}`);
+    process.exit(0);
+  }
+
   // Create API objects for each student
   const studentAPIs = (students || []).map((studentAccessToken) => {
     return initCACCL({
