@@ -142,7 +142,6 @@ module.exports = (config) => {
 
     // Handle refresh token request
     if (req.body.grant_type === 'refresh_token') {
-      console.log('Refresh', req.body);
       // Make sure the credentials are valid
       if (CLIENT_ID !== req.body.client_id) {
         return res.status(401).json({

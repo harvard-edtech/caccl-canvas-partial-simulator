@@ -120,7 +120,7 @@ module.exports = async (config) => {
     // Pull list of assignment groups
     let assignmentGroups;
     try {
-      assignmentGroups = await instructorAPI.course.assignmentGroup.list({
+      assignmentGroups = await instructor.api.course.assignmentGroup.list({
         courseId,
       });
     } catch (err) {
@@ -144,7 +144,7 @@ module.exports = async (config) => {
 
     // Create the assignment
     try {
-      await instructorAPI.course.assignment.create({
+      await instructor.api.course.assignment.create({
         courseId,
         name,
         pointsPossible,
@@ -180,7 +180,6 @@ module.exports = async (config) => {
 
     // Save the current user
     currentUser.set(id);
-    console.log('set', id);
 
     // Get current user's API
     const user = currentUser.get();
@@ -188,7 +187,6 @@ module.exports = async (config) => {
       return res.send('Oops! We could not launch as the user you selected. We could not find their credentials.');
     }
     const { api } = user;
-    console.log(await api.user.self.getProfile());
 
     // Simulate a launch
     if (isNavLaunch) {
