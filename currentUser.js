@@ -1,94 +1,50 @@
 // Keeps track of the current launching user
-
-let group;
-let index;
+let currentUserId;
 
 // Data
-let accessToken;
-let instructorAPI;
-let instructorProfile;
-let tas;
-let taAPIs;
-let taProfiles;
-let students;
-let studentAPIs;
-let studentProfiles;
+const idToUserMap = {}; // id => user
 
 module.exports = {
   /**
    * Gets the current user
-   * @param {string} [group=group of the current user] - the group
-   *   (instructor, ta, student)
-   * @param {number} [index=index of the current user] - the index (ignored
-   *   if the user is in the instructor group)
+   * @param {number} [id] - the id of the current user. If not included, uses
+   *   the most recently set user
    * @param {object|null} current user in form
-   *   { group, index, token, api, profile}
+   *   { id, group, index, token, api, profile}
    */
-  get: (userGroup, userIndex) => {
-    const groupActual = userGroup || group;
-    const indexActual = userIndex || index;
-    if (
-      !groupActual
-      || (indexActual === undefined || indexActual === null)
-      || !accessToken
-    ) {
-      return null;
-    }
-    if (groupActual === 'instructor') {
-      return {
-        group: groupActual,
-        index: indexActual,
-        token: accessToken,
-        api: instructorAPI,
-        profile: instructorProfile,
-      };
-    }
-    if (groupActual === 'ta') {
-      return {
-        group: groupActual,
-        index: indexActual,
-        token: tas[index],
-        api: taAPIs[index],
-        profile: taProfiles[index],
-      };
-    }
-    if (groupActual === 'student') {
-      return {
-        group: groupActual,
-        index: indexActual,
-        token: students[index],
-        api: studentAPIs[index],
-        profile: studentProfiles[index],
-      };
-    }
-    return null;
+  get: (id) => {
+    return idToUserMap[id || currentUserId];
   },
 
   /**
    * Sets the new current user
-   * @param {string} newGroup - the group of the current user (instructor, ta,
-   *   or student)
-   * @param {number} index - the index of the user (ignored for instructor)
+   * @param {number} id - the id of the current user
    */
-  set: (newGroup, newIndex) => {
-    group = newGroup;
-    index = newIndex;
+  set: (id) => {
+    currentUserId = id;
   },
 
   /**
    * Stores relevant user data for use during get()
    */
   addData: (opts) => {
-    ({
-      accessToken,
-      instructorAPI,
-      instructorProfile,
+    const {
+      instructor,
       tas,
-      taAPIs,
-      taProfiles,
       students,
-      studentAPIs,
-      studentProfiles,
-    } = opts);
+    } = opts;
+
+    // Save instructor
+    idToUserMap[instructor.id] = instructor;
+
+    // Save TAs
+    tas.forEach((ta) => {
+      idToUserMap[ta.id] = ta;
+    });
+
+    // Save Students
+    students.forEach((student) => {
+      idToUserMap[student.id] = student;
+    });
   },
 };

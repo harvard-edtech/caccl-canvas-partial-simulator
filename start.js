@@ -48,14 +48,11 @@ module.exports = async () => {
 
   // Set up default values and make sure required values exist
   const canvasHost = config.canvasHost || 'canvas.instructure.com';
-  const students = config.students || [];
-  const tas = config.tas || [];
   const launchURL = config.launchURL || 'https://localhost/launch';
   const consumerKey = config.consumerKey || 'consumer_key';
   const consumerSecret = config.consumerSecret || 'consumer_secret';
   const appName = config.appName || DEFAULT_APP_NAME;
-  const { accessToken } = config;
-  if (!accessToken) {
+  if (!config.accessToken) {
     // No default user
     console.log('\nNo instructor access token found in /config/devEnvironment.js. Now quitting.');
     process.exit(0);
@@ -66,6 +63,21 @@ module.exports = async () => {
     console.log('\nNo courseId found in /config/devEnvironment.js. Now quitting.');
     process.exit(0);
   }
+
+  // Create people objects
+  const instructor = {
+    accessToken: config.accessToken,
+  };
+  const students = (config.students || []).map((accessToken) => {
+    return {
+      accessToken,
+    };
+  });
+  const tas = (config.tas || []).map((accessToken) => {
+    return {
+      accessToken,
+    };
+  });
 
   /* --------------------------- Express -------------------------- */
 
@@ -140,21 +152,25 @@ module.exports = async () => {
   /* -------------------- Create API Instances -------------------- */
 
   // Create a main API object
-  const instructorAPI = initCACCL({
+  instructor.api = initCACCL({
     canvasHost,
-    accessToken,
+    accessToken: instructor.accessToken,
   });
 
-  // Verify that this API is an instructor
+  // Verify that this API is an instructor and pull their profile
   try {
     // Pull Canvas info
     const [
       studentObjects,
       profile,
     ] = await Promise.all([
-      instructorAPI.course.listStudents({ courseId }),
-      instructorAPI.user.self.getProfile(),
+      instructor.api.course.listStudents({ courseId }),
+      instructor.api.user.self.getProfile(),
     ]);
+
+    // Save profile and id to instructor
+    instructor.id = profile.id;
+    instructor.profile = profile;
 
     const instructorId = profile.id;
     for (let i = 0; i < studentObjects.length; i++) {
@@ -170,18 +186,18 @@ module.exports = async () => {
   }
 
   // Create API objects for each student
-  const studentAPIs = (students || []).map((studentAccessToken) => {
-    return initCACCL({
+  students.forEach((student, i) => {
+    students[i].api = initCACCL({
       canvasHost,
-      accessToken: studentAccessToken,
+      accessToken: student.accessToken,
     });
   });
 
   // Create API objects for each TA
-  const taAPIs = (tas || []).map((taAccessToken) => {
-    return initCACCL({
+  tas.forEach((ta, i) => {
+    tas[i].api = initCACCL({
       canvasHost,
-      accessToken: taAccessToken,
+      accessToken: ta.accessToken,
     });
   });
 
@@ -198,36 +214,33 @@ module.exports = async () => {
   };
   updateLoadingBar();
 
-  let instructorProfile;
-  const studentProfiles = [];
-  const taProfiles = [];
+  // Pull all profiles except instructor (that was pulled earlier)
   try {
     const tasks = [];
 
-    const addTask = (api, type) => {
+    const addTask = (api, group, i) => {
       tasks.push(async () => {
         const profile = await api.user.self.getProfile();
-        if (type === 'instructor') {
-          instructorProfile = profile;
-        } else if (type === 'student') {
-          studentProfiles.push(profile);
+        if (group === 'student') {
+          students[i].group = group;
+          students[i].profile = profile;
+          students[i].id = profile.id;
         } else {
-          taProfiles.push(profile);
+          tas[i].group = group;
+          tas[i].profile = profile;
+          tas[i].id = profile.id;
         }
       });
     };
 
-    // Add instructor task
-    addTask(instructorAPI, 'instructor');
-
     // Add student tasks
-    studentAPIs.forEach((api) => {
-      addTask(api, 'student');
+    students.forEach((student, i) => {
+      addTask(student.api, 'student', i);
     });
 
     // Add TA tasks
-    taAPIs.forEach((api) => {
-      addTask(api, 'ta');
+    tas.forEach((ta, i) => {
+      addTask(ta.api, 'ta', i);
     });
 
     // Run all tasks
@@ -237,34 +250,15 @@ module.exports = async () => {
     process.exit(0);
   }
 
-  // Sort the lists
-  const comparator = (a, b) => {
-    if (a.sortable_name < b.sortable_name) {
-      return -1;
-    }
-    if (a.sortable_name > b.sortable_name) {
-      return 1;
-    }
-    return 0;
-  };
-  studentProfiles.sort(comparator);
-  taProfiles.sort(comparator);
-
   // End loading bar
   tasksFinished = true;
 
   /* ------------- Store Data for Current User Lookup ------------- */
 
   currentUser.addData({
-    accessToken,
-    instructorAPI,
-    instructorProfile,
+    instructor,
     tas,
-    taAPIs,
-    taProfiles,
     students,
-    studentAPIs,
-    studentProfiles,
   });
 
   /* --------------------- Initialize Services -------------------- */
@@ -277,12 +271,9 @@ module.exports = async () => {
     launchURL,
     consumerKey,
     consumerSecret,
-    instructorAPI,
-    instructorProfile,
-    taAPIs,
-    taProfiles,
-    studentAPIs,
-    studentProfiles,
+    instructor,
+    tas,
+    students,
   });
 
   // Initialize OAuth

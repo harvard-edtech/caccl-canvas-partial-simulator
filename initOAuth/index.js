@@ -6,23 +6,20 @@ const CLIENT_ID = 'client_id';
 const CLIENT_SECRET = 'client_secret';
 
 // Code Generation
-const genCode = (group, index) => {
-  return `simulated-oauth-code-${group}-${index}`;
+const genCode = (id) => {
+  return `simulated-oauth-code-for-${id}`;
 };
 
 // Refresh Token Generation
-const genRefreshToken = (group, index) => {
-  return `simulated-refresh-token-${group}-${index}`;
+const genRefreshToken = (id) => {
+  return `simulated-refresh-token-for-${id}`;
 };
-const parseRefreshToken = (code) => {
+const refreshTokenToId = (code) => {
   const parts = code.split('-');
   if (parts.length !== 5) {
     return null;
   }
-  return {
-    group: parts[3],
-    index: parseInt(parts[4]),
-  };
+  return parseInt(parts[4]);
 };
 
 // Keep track of token expiry
@@ -68,10 +65,10 @@ module.exports = (config) => {
     if (!user) {
       return res.send('while(1);{"error":"invalid_client","error_description":"unknown client"}');
     }
-    const { group, index } = user;
+    const { id } = user;
 
     // Generate a code
-    const code = genCode(group, index);
+    const code = genCode(id);
 
     // Show authorize page
     res.render(path.join(__dirname, 'authorizePage'), {
@@ -110,12 +107,11 @@ module.exports = (config) => {
         });
       }
       const {
-        group,
-        index,
-        token,
+        id,
+        accessToken,
         profile,
       } = user;
-      if (genCode(group, index) !== req.body.code) {
+      if (genCode(id) !== req.body.code) {
         return res.status(400).json({
           error: 'invalid_grant',
           error_description: 'authorization_code not found',
@@ -123,20 +119,20 @@ module.exports = (config) => {
       }
 
       // Reset the expiry time
-      resetTokenExpiry(token);
+      resetTokenExpiry(accessToken);
 
       // Generate a refresh token
-      const refreshToken = genRefreshToken(group, index);
+      const refreshToken = genRefreshToken(id);
 
       // Respond to the request
       return res.json({
-        access_token: token,
+        access_token: accessToken,
         refresh_token: refreshToken,
         expires_in: 3600,
         token_type: 'Bearer',
         user:
           {
-            id: profile.id,
+            id,
             name: profile.name,
             global_id: null,
             effective_locale: 'en',
@@ -146,6 +142,7 @@ module.exports = (config) => {
 
     // Handle refresh token request
     if (req.body.grant_type === 'refresh_token') {
+      console.log('Refresh', req.body);
       // Make sure the credentials are valid
       if (CLIENT_ID !== req.body.client_id) {
         return res.status(401).json({
@@ -161,36 +158,35 @@ module.exports = (config) => {
       }
 
       // Parse the refresh token
-      const data = parseRefreshToken(req.body.refresh_token);
-      if (!data || !data.group) {
+      const id = refreshTokenToId(req.body.refresh_token);
+      if (!id) {
         return res.status(400).json({
           error: 'invalid_grant',
           error_description: 'authorization_code not found',
         });
       }
-      const { group, index } = data;
 
       // Get the access token
-      const user = currentUser.get(group, index);
+      const user = currentUser.get(id);
       if (!user) {
         return res.status(401).json({
           error: 'invalid_client',
           error_description: 'invalid client',
         });
       }
-      const { token, profile } = user;
+      const { accessToken, profile } = user;
 
       // Reset expiry
-      resetTokenExpiry(token);
+      resetTokenExpiry(accessToken);
 
       // Respond to request
       return res.json({
-        access_token: token,
+        access_token: accessToken,
         expires_in: 3600,
         token_type: 'Bearer',
         user:
           {
-            id: profile.id,
+            id,
             name: profile.name,
             global_id: null,
             effective_locale: 'en',

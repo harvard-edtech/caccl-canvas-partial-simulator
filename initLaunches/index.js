@@ -16,18 +16,12 @@ const currentUser = require('../currentUser');
  *   created OAuth message
  * @param {string} consumerSecret - the consumer secret of the installation so
  *   we can encrypt the OAuth message
- * @param {caccl-api} instructorAPI - a CACCL-api instance for an instructor
- *   in the sandbox course
- * @param {object} instructorProfile - a Canvas profile object for
- *   an instructor in the sandbox course
- * @param {caccl-api[]} [taAPIs] - a list of CACCL-api instances for TAs
- *   in the sandbox course
- * @param {object[]} [taProfiles] - a list of Canvas profile object for
- *   TAs in the sandbox course
- * @param {caccl-api[]} [studentAPIs] - a list of CACCL-api instances for
- *   students in the sandbox course
- * @param {object[]} [studentProfiles] - a list of Canvas profile object for
- *   students in the sandbox course
+ * @param {object} instructor - an instructor in the form:
+ *   { id, profile, accessToken, api }
+ * @param {object[]} tas - a list of TAs in the form:
+ *   { id, profile, accessToken, api }
+ * @param {object[]} students - a list of students in the form:
+ *   { id, profile, accessToken, api }
  */
 module.exports = async (config) => {
   /* ----------------------- Process Config ----------------------- */
@@ -40,12 +34,9 @@ module.exports = async (config) => {
     launchURL,
     consumerKey,
     consumerSecret,
-    instructorAPI,
-    instructorProfile,
-    taAPIs,
-    taProfiles,
-    studentAPIs,
-    studentProfiles,
+    instructor,
+    tas,
+    students,
   } = config;
 
   /* ---------------------- Find the Sim App ---------------------- */
@@ -53,7 +44,7 @@ module.exports = async (config) => {
   let simApp;
   try {
     // Check if the course already has a fake app installed
-    const apps = await instructorAPI.course.app.list({ courseId });
+    const apps = await instructor.api.course.app.list({ courseId });
     // Search for simulated app
     for (let i = 0; i < apps.length; i++) {
       if (
@@ -79,7 +70,7 @@ module.exports = async (config) => {
       );
 
       // Create the app
-      simApp = await instructorAPI.course.app.add({
+      simApp = await instructor.api.course.app.add({
         courseId,
         name: appName,
         key: consumerKey,
@@ -97,7 +88,7 @@ module.exports = async (config) => {
     // Get the list of assignments
     let assignments;
     try {
-      assignments = await instructorAPI.course.assignment.list({
+      assignments = await instructor.api.course.assignment.list({
         courseId,
       });
     } catch (err) {
@@ -118,9 +109,9 @@ module.exports = async (config) => {
       path.join(__dirname, 'launchPage'),
       {
         assignments,
-        instructorProfile,
-        taProfiles,
-        studentProfiles,
+        instructor,
+        tas,
+        students,
       }
     );
   });
@@ -174,7 +165,7 @@ module.exports = async (config) => {
     return res.render(path.join(__dirname, 'assignmentCreated'));
   });
 
-  app.get('/simulator/launch/:context/:group/:index', async (req, res) => {
+  app.get('/simulator/launch/:context/:id', async (req, res) => {
     // Check type of launch and parse assignmentId (if applicable)
     let isNavLaunch = true;
     let assignmentId;
@@ -184,21 +175,20 @@ module.exports = async (config) => {
       isNavLaunch = false;
     }
 
-    // Get API instance
-    let api;
-    if (req.params.group === 'instructor' && req.params.index === '0') {
-      api = instructorAPI;
-    } else if (req.params.group === 'ta') {
-      api = taAPIs[parseInt(req.params.index)];
-    } else if (req.params.group === 'student') {
-      api = studentAPIs[parseInt(req.params.index)];
-    }
-    if (!api) {
-      return res.send('Oops! We could not launch as the user you selected. We could not find their credentials.');
-    }
+    // Parse user's id
+    const id = parseInt(req.params.id);
 
     // Save the current user
-    currentUser.set(req.params.group, parseInt(req.params.index));
+    currentUser.set(id);
+    console.log('set', id);
+
+    // Get current user's API
+    const user = currentUser.get();
+    if (!user || !user.api) {
+      return res.send('Oops! We could not launch as the user you selected. We could not find their credentials.');
+    }
+    const { api } = user;
+    console.log(await api.user.self.getProfile());
 
     // Simulate a launch
     if (isNavLaunch) {
