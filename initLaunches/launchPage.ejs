@@ -216,7 +216,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Launch from which assignment?</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button id="close-assignment-chooser-button" type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -227,6 +227,7 @@
             role="button"
             class="btn btn-success btn-block"
             href="/simulator/create-assignment"
+            id="create-assignment-button"
           >
             + Create Assignment
           </a>
@@ -258,6 +259,7 @@
             type="button"
             class="btn btn-warning btn-lg font-weight-bold"
             onclick="showAssignments(<%= instructor.id %>);"
+            id="instructor_0-assignment-launch-button"
           >
             Assignment Launch
           </button>
@@ -266,6 +268,7 @@
             class="btn btn-primary btn-lg font-weight-bold"
             href="/simulator/launch/nav/<%= instructor.id %>"
             target="_blank"
+            id="instructor_0-launch-button"
           >
             Nav Launch
           </a>
@@ -312,6 +315,7 @@
                   type="button"
                   class="btn btn-warning btn-lg font-weight-bold"
                   onclick="showAssignments(<%= ta.id %>);"
+                  id="ta_<%= i %>-assignment-launch-button"
                 >
                   Assignment Launch
                 </button>
@@ -320,6 +324,7 @@
                   class="btn btn-primary btn-lg font-weight-bold"
                   href="/simulator/launch/nav/<%= ta.id %>"
                   target="_blank"
+                  id="ta_<%= i %>-launch-button"
                 >
                   Nav Launch
                 </a>
@@ -369,6 +374,7 @@
                   type="button"
                   class="btn btn-warning btn-lg font-weight-bold"
                   onclick="showAssignments(<%= student.id %>);"
+                  id="student_<%= i %>-assignment-launch-button"
                 >
                   Assignment Launch
                 </button>
@@ -377,6 +383,7 @@
                   class="btn btn-primary btn-lg font-weight-bold"
                   href="/simulator/launch/nav/<%= student.id %>"
                   target="_blank"
+                  id="student_<%= i %>-launch-button"
                 >
                   Nav Launch
                 </a>
