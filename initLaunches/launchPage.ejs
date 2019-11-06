@@ -135,7 +135,7 @@
 
       if (assignments.length > 0) {
         for (i = 0; i < assignments.length; i++) {
-          html += '<a class="btn btn-block btn-warning launch-assignment-button" href="/simulator/launch/' + assignments[i].id + '/' + id + '" target="_blank" onclick="hideAssignments()">Launch <strong>' + assignments[i].name + '</strong></a>\n';
+          html += '<a class="btn btn-block btn-warning launch-assignment-button assignment_' + i + '-launch-button assignment-with-id-' + assignments[i].id + '-launch-button" href="/simulator/launch/' + assignments[i].id + '/' + id + '" target="_blank" onclick="hideAssignments()">Launch <strong>' + assignments[i].name + '</strong></a>\n';
         }
       } else {
         html += '<h3>No test assignments to launch from yet! Click below to create one.</h3>';
