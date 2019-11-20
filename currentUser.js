@@ -46,5 +46,10 @@ module.exports = {
     students.forEach((student) => {
       idToUserMap[student.id] = student;
     });
+
+    // If no current user, start with the instructor
+    if (!currentUserId) {
+      currentUserId = instructor.id;
+    }
   },
 };
