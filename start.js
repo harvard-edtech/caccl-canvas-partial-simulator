@@ -296,7 +296,7 @@ module.exports = async () => {
   initAPIForwarding({
     app,
     canvasHost,
-    apiForwardPathPrefix: null,
+    apiForwardPathPrefix: '',
     numRetries: 1,
   });
 
