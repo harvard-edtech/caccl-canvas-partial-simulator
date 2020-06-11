@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "axios": "^0.19.2",
-    "cypress": "^3.8.3",
+    "cypress": "^4.8.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.1",
     "eslint-plugin-cypress": "^2.8.1",
@@ -45,7 +45,7 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.18.3",
     "ims-lti": "^3.0.2",
-    "mocha": "^5.2.0",
+    "mocha": "^8.0.1",
     "prompt-sync": "^4.2.0"
   }
 }
