@@ -1,6 +1,6 @@
 {
   "name": "caccl-canvas-partial-simulator",
-  "version": "1.0.43",
+  "version": "1.0.44",
   "description": "Partially simulates a Canvas instance, handling OAuth token exchanges and forwarding API requests",
   "main": "index.js",
   "scripts": {
@@ -25,7 +25,7 @@
   "dependencies": {
     "async": "^3.1.1",
     "body-parser": "^1.19.0",
-    "caccl": "^1.1.36",
+    "caccl": "^1.1.41",
     "caccl-api-forwarder": "^1.1.6",
     "clear": "^0.1.0",
     "ejs": "^2.7.4",
