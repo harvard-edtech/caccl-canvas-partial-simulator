@@ -19,10 +19,99 @@ import API from 'caccl-api/lib/types/API';
 import initLaunches from './initLaunches';
 import initOAuth from './initOAuth';
 import parallelLimit from './helpers/parallelLimit';
+import printInstructionsAndExit from './printInstructionsAndExit';
+import currentUser from './currentUser';
 
 // Import ssl
 import cert from './ssl/cert';
 import key from './ssl/key';
+
+/*----------------------------------------*/
+/*                 Helpers                */
+/*----------------------------------------*/
+
+// Printing helpers
+const W = process.stdout.columns;
+
+/**
+ * Calculate the number of spaces on the left of a centered line
+ * @author Gabe Abrams
+ * @param message the centered message
+ * @returns number of spaces on the left
+ */
+const leftBuffer = (message: string) => {
+  return (Math.floor(W / 2) - 1 - Math.ceil(message.length / 2));
+};
+
+/**
+ * Calculate the number of spaces on the right of a centered line
+ * @author Gabe Abrams
+ * @param message the centered message
+ * @returns number of spaces on the right
+ */
+const rightBuffer = (message: string) => {
+  return (Math.ceil(W / 2) - 1 - Math.floor(message.length / 2));
+};
+
+/**
+ * Center and surround text with a border (on left and right)
+ * @author Gabe Abrams
+ * @param str text to print
+ */
+const printMiddleLine = (str: string) => {
+  console.log(
+    '\u2551'
+    + ' '.repeat(leftBuffer(str))
+    + str
+    + ' '.repeat(rightBuffer(str))
+    + '\u2551'
+  );
+};
+
+/**
+ * Center text
+ * @author Gabe Abrams
+ * @param str text to print
+ */
+const printCenteredLine = (str: string) => {
+  console.log(
+    ' '
+    + ' '.repeat(leftBuffer(str))
+    + str
+    + ' '.repeat(rightBuffer(str))
+    + ' '
+  );
+};
+
+/**
+ * Print the top of a box
+ * @author Gabe Abrams
+ */
+const printBoxTop = () => {
+  // Print top of box
+  console.log('\u2554' + '\u2550'.repeat(W - 2) + '\u2557');
+};
+
+/**
+ * Print the bottom of a box
+ * @author Gabe Abrams
+ */
+const printBoxBottom = () => {
+  console.log('\u255A' + '\u2550'.repeat(W - 2) + '\u255D');
+};
+
+/**
+ * Print an alert
+ * @author Gabe Abrams
+ * @param text message
+ */
+const printAlert = (text: string) => {
+  clear();
+  printBoxTop();
+  printMiddleLine(text);
+  printBoxBottom();
+  console.log('');
+};
 
 /*----------------------------------------*/
 /*                 Set Up                 */
@@ -45,15 +134,18 @@ try {
     throw new Error();
   }
 } catch (err) {
-  throw new Error('Make sure you have properly configured your /config/devEnvironment.json file. See bit.ly/caccl for more information.');
+  printAlert('Dev Environment Not Found!');
+  printInstructionsAndExit();
 }
 
 // Make sure required fields are included
 if (!devEnvironment.teacherAccessToken) {
-  throw new Error('Your /config/devEnvironment.json file must include an accessToken parameter');
+  printAlert('Dev Environment Has No "teacherAccessToken"');
+  printInstructionsAndExit();
 }
 if (!devEnvironment.courseId) {
-  throw new Error('Your /config/devEnvironment.json file must include a courseId parameter');
+  printAlert('Dev Environment Has No "courseId"');
+  printInstructionsAndExit();
 }
 
 // Get app package.json
@@ -62,7 +154,14 @@ try {
   // Read the file
   packageJSON = require(`${workingDir}/package.json`);
 } catch (err) {
-  throw new Error('We could not locate your package.json file. Please make sure you\'re starting the app from the top-level directory, which must also be an npm project.');
+  printAlert('Missing package.json File');
+  console.log('Make sure you\'re starting the app from the top-level directory, which must also be an npm project.');
+  process.exit(0);
+}
+if (!packageJSON.name) {
+  printAlert('Invalid package.json File');
+  console.log('Make sure your package.json includes a "name" parameter.');
+  process.exit(0);
 }
 
 /**
@@ -118,7 +217,8 @@ const start = async () => {
   /* -------- Initialize Users -------- */
 
   // Show a loader
-  console.log('Waiting on Canvas...');
+  clear();
+  printCenteredLine('Waiting on Canvas...');
 
   // Create a main API object
   const teacherAPI = initAPI({
@@ -245,6 +345,9 @@ const start = async () => {
   // Initialize OAuth
   initOAuth(app);
 
+  // Add data to current user manager
+  currentUser.addData(teacher, tas, students);
+
   /* ----------------- Initialize Canvas Redirects ---------------- */
 
   // Redirect GET requests that aren't to the API
@@ -290,61 +393,18 @@ const start = async () => {
   server.on(
     'listening',
     () => {
-      // Clear the terminal
+      // Print alert
       clear();
+      printBoxTop();
+      printMiddleLine('Semi-simulated Canvas Now Running');
+      printBoxBottom();
 
-      // Printing helpers
-      const W = process.stdout.columns;
+      console.log('');
+      console.log('To launch your app, visit:');
+      console.log('https://localhost:8088/simulator');
 
-      /**
-       * Calculate the number of spaces on the left of a centered line
-       * @author Gabe Abrams
-       * @param message the centered message
-       * @returns number of spaces on the left
-       */
-      const leftBuffer = (message: string) => {
-        return (Math.floor(W / 2) - 1 - Math.ceil(message.length / 2));
-      };
-
-      /**
-       * Calculate the number of spaces on the right of a centered line
-       * @author Gabe Abrams
-       * @param message the centered message
-       * @returns number of spaces on the right
-       */
-      const rightBuffer = (message: string) => {
-        return (Math.ceil(W / 2) - 1 - Math.floor(message.length / 2));
-      };
-
-      /**
-       * Center and surround text with a border (on left and right)
-       * @author Gabe Abrams
-       * @param str text to print
-       */
-      const printMiddleLine = (str: string) => {
-        console.log(
-          '\u2551'
-          + ' '.repeat(leftBuffer(str))
-          + str
-          + ' '.repeat(rightBuffer(str))
-          + '\u2551'
-        );
-      };
-
-      // Print start message
-      console.log('Partially-simulated Canvas environment running!\n');
-
-      // Print top of box
-      console.log('\u2554' + '\u2550'.repeat(W - 2) + '\u2557');
-
-      // Print middle lines
-      printMiddleLine('To launch your app, visit:');
-      printMiddleLine(`https://localhost:8088/simulator`);
-
-      // Print bottom of box
-      console.log('\u255A' + '\u2550'.repeat(W - 2) + '\u255D');
-
-      console.log('\nYou may need to accept our self-signed certificate.');
+      // Self-signed message
+      console.log('\nYou may need to accept our self-signed certificate');
     },
   );
 };

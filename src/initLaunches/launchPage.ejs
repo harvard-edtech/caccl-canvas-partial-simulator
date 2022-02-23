@@ -26,7 +26,7 @@
 
     /* Body (background color and font to match Canvas authorization page) */
     body {
-      background-color: #313c45;
+      background-color: #222;
       text-align: center;
       font-family: 'Lato', sans-serif;
     }
@@ -38,12 +38,13 @@
       margin-top: 10px;
       max-width: 850px;
       width: 100%;
-      background-color: #37444e;
+      background-color: #333;
       color: black;
       border-radius: 5px;
       -webkit-box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);
       -moz-box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);
       box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.75);
+      border: 0.5px solid gray;
       display: inline-block;
       text-align: left;
     }
@@ -55,7 +56,7 @@
       padding-right: 15px;
       padding-top: 20px;
       padding-bottom: 20px;
-      background-color: #37444e;
+      background-color: #333;
       color: white;
       border-radius: 5px 5px 0 0;
     }
@@ -127,8 +128,8 @@
 
   <script type="text/javascript">
     /* --------------------------- Search --------------------------- */
-    var tas = <%- JSON.stringify(tas) %>;
-    var students = <%- JSON.stringify(students) %>;
+    var tas = <%- JSON.stringify(tas.map((ta) => { return ta.profile; })) %>;
+    var students = <%- JSON.stringify(students.map((student) => { return student.profile; })) %>;
     function updateSearch(type) {
       var query = document.getElementById(type + '-query').value.toLowerCase().trim();
 
@@ -142,7 +143,7 @@
       var i;
       var numShown = 0;
       for (i = 0; i < users.length; i++) {
-        var profile = users[i].profile;
+        var profile = users[i];
         var showThisOne;
         if (query.length === 0) {
           // No query. Show them all!
@@ -196,23 +197,23 @@
     </div>
 
     <div class="content-container">
-      <!-- Instructors -->
-      <h3>Instructor:</h3>
+      <!-- Teachers -->
+      <h3>Teacher:</h3>
       <div class="person">
         <div class="person-label">
           <div class="person-title">
-            <%= instructor.profile.name %>
+            <%= teacher.profile.name %>
           </div>
         </div>
         <div>
           <a
             role="button"
-            class="btn btn-primary btn-lg font-weight-bold"
-            href="/simulator/users/<%= instructor.id %>/launch"
+            class="btn btn-warning btn-lg font-weight-bold"
+            href="/simulator/users/<%= teacher.id %>/launch"
             target="_blank"
-            id="instructor_0-launch-button"
+            id="teacher_0-launch-button"
           >
-            Nav Launch
+            Simulate Launch
           </a>
         </div>
       </div>
@@ -255,12 +256,12 @@
               <div>
                 <a
                   role="button"
-                  class="btn btn-primary btn-lg font-weight-bold"
+                  class="btn btn-warning btn-lg font-weight-bold"
                   href="/simulator/users/<%= ta.id %>/launch"
                   target="_blank"
                   id="ta_<%= i %>-launch-button"
                 >
-                  Nav Launch
+                  Simulate Launch
                 </a>
               </div>
             </div>
@@ -306,12 +307,12 @@
               <div>
                 <a
                   role="button"
-                  class="btn btn-primary btn-lg font-weight-bold"
+                  class="btn btn-warning btn-lg font-weight-bold"
                   href="/simulator/users/<%= student.id %>/launch"
                   target="_blank"
                   id="student_<%= i %>-launch-button"
                 >
-                  Nav Launch
+                  Simulate Launch
                 </a>
               </div>
             </div>

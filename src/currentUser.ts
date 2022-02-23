@@ -12,10 +12,9 @@ const currentUser = {
    * @param [userId] the id of the current user. If not included, uses
    *   the most recently set user
    * @returns current user
-   *   
    */
-  get: (userId?: number) => {
-    return idToUser.get(userId || currentUserId);
+  get: (userId?: number): (User | undefined) => {
+    return idToUser.get(userId ?? currentUserId);
   },
 
   /**
@@ -30,17 +29,17 @@ const currentUser = {
   /**
    * Stores relevant user data for use during get()
    * @author Gabe Abrams
-   * @param instructor instructor user
+   * @param teacher teacher user
    * @param tas list of ta users
    * @param students list of student users
    */
   addData: (
-    instructor: User,
+    teacher: User,
     tas: User[],
     students: User[],
   ) => {
     // Save instructor
-    idToUser.set(instructor.id, instructor);
+    idToUser.set(teacher.id, teacher);
 
     // Save TAs
     tas.forEach((ta) => {
@@ -54,7 +53,7 @@ const currentUser = {
 
     // If no current user, start with the instructor
     if (!currentUserId) {
-      currentUserId = instructor.id;
+      currentUserId = teacher.id;
     }
   },
 };

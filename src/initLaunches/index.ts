@@ -91,7 +91,7 @@ const initLaunches = async (
       const { api } = user;
 
       // Create a unique app name
-      const uniqueAppName = `${appName} - Test on ${(new Date()).toLocaleDateString()}`;
+      const uniqueAppName = `CACCL Test App [${appName}] [${(new Date()).toLocaleDateString()}]`;
 
       // Generate an install xml
       const xml = genInstallXML({
@@ -102,7 +102,7 @@ const initLaunches = async (
       // Create a dummy app
       let testApp: CanvasExternalTool;
       try {
-        testApp = await api.course.app.add({
+        testApp = await teacher.api.course.app.add({
           courseId,
           name: uniqueAppName,
           key: TEST_INSTALL_CREDS.key,
@@ -133,7 +133,7 @@ const initLaunches = async (
         setTimeout(r, 10000);
       });
       try {
-        await api.course.app.remove({
+        await teacher.api.course.app.remove({
           courseId,
           appId: testApp.id,
         });

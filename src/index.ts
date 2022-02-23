@@ -21,5 +21,6 @@ if (majorVersion < 10) {
   console.log('Oops! You are running node version ' + majorVersion + '.');
   console.log('The CACCL Canvas Partial Simulator requires Node 10 or higher. Please update your version of Node.');
 } else {
-  require('./start.js')();
+  var start = require('./start.js');
+  start.default();
 }

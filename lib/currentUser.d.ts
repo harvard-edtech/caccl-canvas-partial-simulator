@@ -5,9 +5,8 @@ declare const currentUser: {
      * @param [userId] the id of the current user. If not included, uses
      *   the most recently set user
      * @returns current user
-     *
      */
-    get: (userId?: number) => User;
+    get: (userId?: number) => (User | undefined);
     /**
      * Sets the new current user
      * @author Gabe Abrams
@@ -17,10 +16,10 @@ declare const currentUser: {
     /**
      * Stores relevant user data for use during get()
      * @author Gabe Abrams
-     * @param instructor instructor user
+     * @param teacher teacher user
      * @param tas list of ta users
      * @param students list of student users
      */
-    addData: (instructor: User, tas: User[], students: User[]) => void;
+    addData: (teacher: User, tas: User[], students: User[]) => void;
 };
 export default currentUser;
