@@ -17,7 +17,7 @@ Create a file `/config/devEnvironment.js` and add it to your `.gitignore`. The `
 module.exports = {
     canvasHost: 'canvas.harvard.edu', // The hostname for your Canvas instance
     courseId: 473829, // The Canvas courseId for your sandbox course
-    accessToken: '1589~30ma90294...', // An access token for an instructor in the sandbox
+    instructorAccessToken: '1589~30ma90294...', // An access token for an instructor in the sandbox
 }
 ```
 
@@ -28,12 +28,12 @@ With just the basic parameters, you can only simulate LTI launches as an instruc
 ```js
 module.exports = {
     ...
-    tas: [
+    taAccessTokens: [
         '1589~n85029kr83...', // An access token for a TA in the sandbox
         '1589~66735hjs08...', // An access token for a TA in the sandbox
         '1589~pbhsd8tha0...', // An access token for a TA in the sandbox
     ],
-    students: [
+    studentAccessTokens: [
         '1589~0bn485039x...', // An access token for a student in the sandbox
         '1589~phha0527nd...', // An access token for a student in the sandbox
         '1589~mxaq28df9s...', // An access token for a student in the sandbox
