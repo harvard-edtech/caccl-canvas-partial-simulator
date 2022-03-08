@@ -2,13 +2,13 @@
 
 import express from 'express';
 import bodyParser from 'body-parser';
-import https from 'https';
 import clear from 'clear';
 
 // Import caccl libs
 import initAPIForwarding from 'caccl-api-forwarder';
 import initAPI from 'caccl-api';
 import CanvasUserProfile from 'caccl-api/lib/types/CanvasUserProfile';
+import serve from 'caccl-dev-server';
 
 // Import shared types
 import User from './shared/types/User';
@@ -21,10 +21,6 @@ import initOAuth from './initOAuth';
 import parallelLimit from './helpers/parallelLimit';
 import printInstructionsAndExit from './printInstructionsAndExit';
 import currentUser from './currentUser';
-
-// Import ssl
-import cert from './ssl/cert';
-import key from './ssl/key';
 
 /*----------------------------------------*/
 /*                 Helpers                */
@@ -373,40 +369,25 @@ const start = async () => {
   /* ------------------------ Start Server ------------------------ */
 
   // Start HTTPS server
-  const server = https.createServer(
-    { key, cert },
+  await serve({
     app,
-  );
-
-  server.listen(8088);
-  server.on('error', (err) => {
-    if (err.message.includes('EADDRINUSE')) {
-      console.log('\nPort 8088 is already in use. Is another copy of the Canvas simulator already running?');
-      process.exit(0);
-    }
-
-    console.log(`\nCould not start simulator because an error occurred: ${err.message}`);
-    process.exit(0);
+    port: 8088,
   });
 
   /* --------------------- Print Start Message -------------------- */
-  server.on(
-    'listening',
-    () => {
-      // Print alert
-      clear();
-      printBoxTop();
-      printMiddleLine('Semi-simulated Canvas Now Running');
-      printBoxBottom();
 
-      console.log('');
-      console.log('To launch your app, visit:');
-      console.log('http://localhost:8088/simulator');
+  // Print alert
+  clear();
+  printBoxTop();
+  printMiddleLine('Semi-simulated Canvas Now Running');
+  printBoxBottom();
 
-      // Self-signed message
-      console.log('\nYou may need to accept our self-signed certificate');
-    },
-  );
+  console.log('');
+  console.log('To launch your app, visit:');
+  console.log('https://localhost:8088/simulator');
+
+  // Self-signed message
+  console.log('\nYou may need to accept our self-signed certificate');
 };
 
 export default start;
