@@ -1,6 +1,6 @@
 {
   "name": "caccl-canvas-partial-simulator",
-  "version": "2.0.0-beta.12",
+  "version": "2.0.0-beta.15",
   "description": "Partially simulates a Canvas instance, handling OAuth token exchanges and forwarding API requests",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -27,15 +27,12 @@
   },
   "homepage": "https://github.com/harvard-edtech/canvas-partial-simulator#readme",
   "dependencies": {
-    "async": "^3.1.1",
-    "body-parser": "^1.19.0",
-    "caccl-api": "^2.0.0-beta.10",
-    "caccl-api-forwarder": "^2.0.0-beta.10",
-    "caccl-dev-server": "^2.0.0-beta.11",
+    "caccl-api": "^2.0.0-beta.15",
+    "caccl-api-forwarder": "^2.0.0-beta.15",
+    "caccl-dev-server": "^2.0.0-beta.15",
     "clear": "^0.1.0",
     "ejs": "^2.7.4",
-    "express": "^4.17.1",
-    "https": "^1.0.0"
+    "express": "^4.17.1"
   },
   "devDependencies": {
     "@types/async": "^3.2.12",

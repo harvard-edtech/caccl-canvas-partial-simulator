@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 
 import express from 'express';
-import bodyParser from 'body-parser';
 import clear from 'clear';
 
 // Import caccl libs
@@ -187,16 +186,9 @@ const start = async () => {
   // Set up ejs
   app.set('view engine', 'ejs');
 
-  // Set up body json parsing
-  app.use(bodyParser.json({
-    limit: '5mb',
-  }));
-
-  // Set up body application/x-www-form-urlencoded parsing
-  app.use(bodyParser.urlencoded({
-    extended: true,
-    limit: '5mb',
-  }));
+  // Set up body parsing
+  express.json();
+  express.urlencoded({ extended: true, limit: '5mb' });
 
   // Allow cross origin connections
   app.use((req, res, next) => {
