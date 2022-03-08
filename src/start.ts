@@ -401,7 +401,7 @@ const start = async () => {
 
       console.log('');
       console.log('To launch your app, visit:');
-      console.log('https://localhost:8088/simulator');
+      console.log('http://localhost:8088/simulator');
 
       // Self-signed message
       console.log('\nYou may need to accept our self-signed certificate');

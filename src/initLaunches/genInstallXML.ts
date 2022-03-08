@@ -43,12 +43,12 @@ const genInstallXML = (
         <blti:title>${appName}</blti:title>
         <blti:description>CACCL test app (you can remove this)</blti:description>
         <blti:icon></blti:icon>
-        <blti:launch_url>https://localhost:8080${CACCL_PATHS.LAUNCH}</blti:launch_url>
+        <blti:launch_url>http://localhost:8080${CACCL_PATHS.LAUNCH}</blti:launch_url>
         ${customParamsInsert}
         <blti:extensions platform="canvas.instructure.com">
           <lticm:property name="privacy_level">public</lticm:property>
           <lticm:options name="homework_submission">
-            <lticm:property name="url">https://localhost:8080${CACCL_PATHS.LAUNCH}</lticm:property>
+            <lticm:property name="url">http://localhost:8080${CACCL_PATHS.LAUNCH}</lticm:property>
             <lticm:property name="text">${appName}</lticm:property>
             <lticm:property name="selection_width">400</lticm:property>
             <lticm:property name="selection_height">300</lticm:property>
@@ -56,7 +56,7 @@ const genInstallXML = (
             <lticm:property name="windowTarget">_blank</lticm:property>
           </lticm:options>
           <lticm:options name="course_navigation">
-            <lticm:property name="url">https://localhost:8080${CACCL_PATHS.LAUNCH}</lticm:property>
+            <lticm:property name="url">http://localhost:8080${CACCL_PATHS.LAUNCH}</lticm:property>
             <lticm:property name="text">${appName}</lticm:property>
             <lticm:property name="visibility">public</lticm:property>
             <lticm:property name="default">disabled</lticm:property>
