@@ -356,6 +356,7 @@ const start = async () => {
   initAPIForwarding({
     app,
     numRetries: 1,
+    forwarderPrefix: '',
   });
 
   /* ------------------------ Start Server ------------------------ */
