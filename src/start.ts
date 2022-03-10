@@ -187,8 +187,8 @@ const start = async () => {
   app.set('view engine', 'ejs');
 
   // Set up body parsing
-  express.json();
-  express.urlencoded({ extended: true, limit: '5mb' });
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
   // Allow cross origin connections
   app.use((req, res, next) => {
