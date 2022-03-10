@@ -357,6 +357,7 @@ const start = async () => {
     app,
     numRetries: 1,
     forwarderPrefix: '',
+    defaultCanvasHost: canvasHost,
   });
 
   /* ------------------------ Start Server ------------------------ */
