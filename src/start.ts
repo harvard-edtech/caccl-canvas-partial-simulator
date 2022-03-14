@@ -341,6 +341,15 @@ const start = async () => {
 
   /* ----------------- Initialize Canvas Redirects ---------------- */
 
+  // Self launch intercept
+  app.get(
+    `/courses/:courseId/external_tools/${CACCL_SIM_TOOL_ID}?display=borderless`,
+    async (req, res) => {
+      // Show the launch chooser in self-launch form
+      return res.redirect('/simulator?isSelfLaunch=true');
+    },
+  );
+
   // Redirect GET requests that aren't to the API
   app.get(
     '*',
@@ -352,15 +361,6 @@ const start = async () => {
 
       // Redirect to Canvas
       return res.redirect(`https://${canvasHost}${req.originalUrl}`);
-    },
-  );
-
-  // Self launch handling
-  app.get(
-    `/courses/:courseId/external_tools/${CACCL_SIM_TOOL_ID}?display=borderless`,
-    async (req, res) => {
-      // Show the launch chooser in self-launch form
-      return res.redirect('/simulator?isSelfLaunch=true');
     },
   );
 
