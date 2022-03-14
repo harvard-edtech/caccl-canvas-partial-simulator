@@ -14,6 +14,9 @@ import User from './shared/types/User';
 import Group from './shared/types/Group';
 import API from 'caccl-api/lib/types/API';
 
+// Import shared constants
+import CACCL_SIM_TOOL_ID from './shared/constants/CACCL_SIM_TOOL_ID';
+
 // Import helpers
 import initLaunches from './initLaunches';
 import initOAuth from './initOAuth';
@@ -349,6 +352,15 @@ const start = async () => {
 
       // Redirect to Canvas
       return res.redirect(`https://${canvasHost}${req.originalUrl}`);
+    },
+  );
+
+  // Self launch handling
+  app.get(
+    `/courses/:courseId/external_tools/${CACCL_SIM_TOOL_ID}?display=borderless`,
+    async (req, res) => {
+      // Show the launch chooser in self-launch form
+      return res.redirect('/simulator?isSelfLaunch=true');
     },
   );
 

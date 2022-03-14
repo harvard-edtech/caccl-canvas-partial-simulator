@@ -64,6 +64,10 @@ const initLaunches = async (
           teacher,
           tas,
           students,
+          isSelfLaunch: (
+            req.query.isSelfLaunch
+            && req.query.isSelfLaunch === 'true'
+          ),
         }
       );
     },
