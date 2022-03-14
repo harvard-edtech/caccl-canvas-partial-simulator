@@ -343,7 +343,7 @@ const start = async () => {
 
   // Self launch intercept
   app.get(
-    `/courses/:courseId/external_tools/${CACCL_SIM_TOOL_ID}?display=borderless`,
+    `/courses/:courseId/external_tools/${CACCL_SIM_TOOL_ID}`,
     async (req, res) => {
       // Show the launch chooser in self-launch form
       return res.redirect('/simulator?isSelfLaunch=true');
