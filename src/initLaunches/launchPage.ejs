@@ -129,8 +129,8 @@
 
   <script type="text/javascript">
     /* --------------------------- Search --------------------------- */
-    var tas = <% - JSON.stringify(tas.map((ta) => { return ta.profile; })) %>;
-    var students = <% - JSON.stringify(students.map((student) => { return student.profile; })) %>;
+    var tas = <%- JSON.stringify(tas.map((ta) => { return ta.profile; })) %>;
+    var students = <%- JSON.stringify(students.map((student) => { return student.profile; })) %>;
     function updateSearch(type) {
       var query = document.getElementById(type + '-query').value.toLowerCase().trim();
 
@@ -224,7 +224,7 @@
       </div>
 
       <!-- TAs -->
-      <% if (tas.length> 0) { %>
+      <% if (tas.length > 0) { %>
         <h3 class="mt-2">TAs:</h3>
 
         <!-- Search -->
@@ -242,70 +242,82 @@
             </div>
             Please broaden your search.
           </div>
-          <% } %>
+        <% } %>
 
-            <div class="scrollpane">
-              <% tas.forEach((ta, i)=> { %>
-                <div class="person" id="ta-<%= i %>">
-                  <div class="person-label">
-                    <div class="person-title">
-                      <%= ta.profile.name %>
-                    </div>
-                  </div>
-                  <div>
-                    <a role="button" class="btn btn-warning btn-lg font-weight-bold"
-                      href="/simulator/users/<%= ta.id %>/launch" target="<%= (isSelfLaunch ? '_self' : '_blank' ) %>"
-                      id="ta_<%= i %>-launch-button">
-                      <%= (isSelfLaunch ? 'Simulate Login' : 'Simulate Launch' ) %>
-                    </a>
-                  </div>
+        <div class="scrollpane">
+          <% tas.forEach((ta, i)=> { %>
+            <div class="person" id="ta-<%= i %>">
+              <div class="person-label">
+                <div class="person-title">
+                  <%= ta.profile.name %>
                 </div>
-                <% }); %>
+              </div>
+              <div>
+                <a role="button" class="btn btn-warning btn-lg font-weight-bold"
+                  href="/simulator/users/<%= ta.id %>/launch" target="<%= (isSelfLaunch ? '_self' : '_blank' ) %>"
+                  id="ta_<%= i %>-launch-button">
+                  <%= (isSelfLaunch ? 'Simulate Login' : 'Simulate Launch' ) %>
+                </a>
+              </div>
             </div>
-            <% } %>
+          <% }); %>
+        </div>
+      <% } %>
 
-              <!-- Students -->
-              <% if (students.length> 0) { %>
-                <h3 class="mt-2">Students:</h3>
+      <!-- Students -->
+      <% if (students.length> 0) { %>
+        <h3 class="mt-2">Students:</h3>
 
-                <!-- Search -->
-                <% if (students.length> 4) { %>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">Search:</span>
-                    </div>
-                    <input type="text" id="student-query" class="form-control" aria-label="Search Students"
-                      oninput="updateSearch('student');">
-                  </div>
+        <!-- Search -->
+        <% if (students.length> 4) { %>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Search:</span>
+            </div>
+            <input
+              type="text"
+              id="student-query"
+              class="form-control"
+              aria-label="Search Students"
+              oninput="updateSearch('student');"
+            >
+          </div>
 
-                  <div class="alert alert-warning" style="display: none" id="student-none">
-                    <div>
-                      <strong>No students found</strong>
-                    </div>
-                    Please broaden your search.
-                  </div>
-                  <% } %>
+          <div
+            class="alert alert-warning"
+            style="display: none"
+            id="student-none"
+          >
+            <div>
+              <strong>No students found</strong>
+            </div>
+            Please broaden your search.
+          </div>
+        <% } %>
 
-                    <div class="scrollpane">
-                      <% students.forEach((student, i)=> { %>
-                        <div class="person" id="student-<%= i %>">
-                          <div class="person-label">
-                            <div class="person-title">
-                              <%= student.profile.name %>
-                            </div>
-                          </div>
-                          <div>
-                            <a role="button" class="btn btn-warning btn-lg font-weight-bold"
-                              href="/simulator/users/<%= student.id %>/launch"
-                              target="<%= (isSelfLaunch ? '_self' : '_blank' ) %>" id="student_<%= i %>-launch-button">
-                              <%= (isSelfLaunch ? 'Simulate Login' : 'Simulate Launch' ) %>
-                            </a>
-                          </div>
-                        </div>
-                        <% }); %>
-                    </div>
-                    <% } %>
+        <div class="scrollpane">
+          <% students.forEach((student, i)=> { %>
+            <div class="person" id="student-<%= i %>">
+              <div class="person-label">
+                <div class="person-title">
+                  <%= student.profile.name %>
+                </div>
+              </div>
+              <div>
+                <a
+                  role="button"
+                  class="btn btn-warning btn-lg font-weight-bold"
+                  href="/simulator/users/<%= student.id %>/launch"
+                  target="<%= (isSelfLaunch ? '_self' : '_blank' ) %>"
+                  id="student_<%= i %>-launch-button"
+                >
+                  <%= (isSelfLaunch ? 'Simulate Login' : 'Simulate Launch' ) %>
+                </a>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } %>
     </div><!-- End content container -->
   </div><!-- End Container -->
-
 </body>
