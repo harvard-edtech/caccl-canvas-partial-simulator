@@ -106,14 +106,12 @@ const initLaunches = async (
       // Create a dummy app
       let testApp: CanvasExternalTool;
       try {
-        testApp = await teacher.api.course.app.add({
+        testApp = await teacher.api.course.app.addByXML({
           courseId,
           name: uniqueAppName,
           key: TEST_INSTALL_CREDS.key,
           secret: TEST_INSTALL_CREDS.secret,
           xml,
-          description: 'CACCL test app (you can remove this)',
-          launchPrivacy: 'members',
         });
       } catch (err) {
         return res.send(`Oops! We could not launch as the user you selected. We could not create a test app in your sandbox course because an error occurred: ${err.message}`);
