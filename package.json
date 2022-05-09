@@ -31,7 +31,7 @@
     "caccl-api-forwarder": "^2.0.2",
     "caccl-dev-server": "^2.0.2",
     "clear": "^0.1.0",
-    "ejs": "^2.7.4",
+    "ejs": "^3.1.7",
     "express": "^4.17.1"
   },
   "devDependencies": {
