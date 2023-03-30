@@ -11,7 +11,7 @@ import User from '../shared/types/User';
  * @param {User} opts.teacher an instructor
  * @param {User[]} opts.tas a list of TAs
  * @param {User[]} opts.students a list of students
- * @param {object} [opts.customParams] map of custom parameters
+ * @param {object} [opts.customLaunchPaths] map of custom parameters
  */
 declare const initLaunches: (opts: {
     app: express.Application;
@@ -23,5 +23,9 @@ declare const initLaunches: (opts: {
     customParams?: {
         [k: string]: string;
     };
+    customLaunchPaths?: {
+        name: string;
+        path: string;
+    }[];
 }) => Promise<void>;
 export default initLaunches;

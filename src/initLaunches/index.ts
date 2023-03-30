@@ -25,7 +25,7 @@ import TEST_INSTALL_CREDS from '../shared/constants/TEST_INSTALL_CREDS';
  * @param {User} opts.teacher an instructor
  * @param {User[]} opts.tas a list of TAs
  * @param {User[]} opts.students a list of students
- * @param {object} [opts.customParams] map of custom parameters
+ * @param {object} [opts.customLaunchPaths] map of custom parameters
  */
 const initLaunches = async (
   opts: {
@@ -36,6 +36,10 @@ const initLaunches = async (
     tas: User[],
     students: User[],
     customParams?: { [k: string]: string },
+    customLaunchPaths?: {
+      name: string,
+      path: string,
+    }[],
   },
 ) => {
   const {
@@ -46,6 +50,7 @@ const initLaunches = async (
     tas,
     students,
     customParams = {},
+    customLaunchPaths = [],
   } = opts;
 
   /* --------------------------- Routes --------------------------- */
@@ -68,6 +73,7 @@ const initLaunches = async (
             req.query.isSelfLaunch
             && req.query.isSelfLaunch === 'true'
           ),
+          customLaunchPaths,
         }
       );
     },

@@ -1,4 +1,5 @@
 # caccl-canvas-partial-simulator
+
 Partially simulates a Canvas instance, handling OAuth token exchanges and forwarding API requests.
 
 As an LTI app developer, you want to be able to test your app, simulating the process of launching your app and running through the oauth2 handshake to approve your Canvas app and get a Canvas access token on behalf of the user. In many settings, Canvas is managed by central IT and is surrounded by protocol and policy. This often makes it slow or difficult to add _test apps_ to the list of approved Canvas integrations. Usually, you'll need to get every single development instance of your app approved to interact with Canvas. Finally, when developing on `localhost`, for your app to go through the oauth2 handshake, Canvas would need to have `localhost` set as an approved integration. This is obviously a terrible idea.
@@ -51,6 +52,40 @@ To make everything work, we add a test LTI app to your sandbox course. This app 
 module.exports = {
     ...
     appName: 'My App Name',
+};
+```
+
+#### Optional: add custom launch parameters
+
+To include specific launch parameters in every LTI launch request, include a `customParams` map in your devEnvironment.json file:
+
+```js
+module.exports = {
+    ...
+    customParams: {
+        "name": "value",
+        "anotherName": "anotherValue"
+    },
+};
+```
+
+#### Optional: add custom launch paths
+
+Some apps don't get launched via the `/` path. This is an unusual case, but nevertheless, it is supported by `caccl`. To include custom launch paths, simply include them in a list:
+
+```js
+module.exports = {
+    ...
+    customLaunchPaths: [
+        {
+            "name": "Cat Video Player",
+            "path": "/videos/cats"
+        },
+        {
+            "name": "Desserts Video Player",
+            "path": "/videos/desserts"
+        }
+    ],
 };
 ```
 

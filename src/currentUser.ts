@@ -9,6 +9,7 @@ const idToUser = new Map<number, User>(); // id => user
 const currentUser = {
   /**
    * Gets the current user
+   * @author Gabe Abrams
    * @param [userId] the id of the current user. If not included, uses
    *   the most recently set user
    * @returns current user

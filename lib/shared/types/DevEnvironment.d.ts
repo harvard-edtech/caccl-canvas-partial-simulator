@@ -1,4 +1,4 @@
-declare type DevEnvironment = {
+type DevEnvironment = {
     canvasHost: string;
     courseId: number;
     appName: string;

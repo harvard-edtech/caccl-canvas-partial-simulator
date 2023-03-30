@@ -181,6 +181,10 @@ const start = async () => {
   const taAccessTokens: string[] = (devEnvironment.taAccessTokens ?? []);
   const studentAccessTokens: string[] = (devEnvironment.studentAccessTokens ?? []);
   const customParams: { [k: string]: any } = (devEnvironment.customParams);
+  const customLaunchPaths: {
+    name: string,
+    path: string,
+  }[] = (devEnvironment.customLaunchPaths ?? []);
 
   /* ------------- Server ------------- */
 
@@ -333,6 +337,7 @@ const start = async () => {
     tas,
     students,
     customParams,
+    customLaunchPaths,
   });
 
   // Initialize OAuth
